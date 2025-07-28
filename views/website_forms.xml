@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Success Template -->
+    <template id="form_success" name="Form Submission Success">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="alert alert-success">
+                    <h4><i class="fa fa-check-circle"/> Success!</h4>
+                    <p>Your <t t-esc="form_type"/> inquiry has been submitted successfully.</p>
+                    <p>Reference Number: <strong><t t-esc="inquiry_id"/></strong></p>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-primary">Return to Home</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Error Template -->
+    <template id="form_submission_error" name="Form Submission Error">
+        <t t-call="website.layout">
+            <div class="container mt-5">
+                <div class="alert alert-danger">
+                    <h4><i class="fa fa-exclamation-triangle"/> Error</h4>
+                    <p>There was a problem processing your <t t-esc="form_type"/> form:</p>
+                    <p><t t-esc="error_message"/></p>
+                </div>
+                <div class="text-center mt-4">
+                    <button onclick="window.history.back()" class="btn btn-primary">Go Back</button>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

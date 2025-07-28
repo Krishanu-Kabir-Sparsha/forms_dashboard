@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="form_success" name="Form Submission Success">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="alert alert-success text-center">
+                    <h3>Thank you for your submission!</h3>
+                    <p>We will review your information and get back to you soon.</p>
+                    <a href="/" class="btn btn-primary mt-3">Return to Homepage</a>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="form_error" name="Form Submission Error">
+        <t t-call="website.layout">
+            <div class="container mt-5 mb-5">
+                <div class="alert alert-danger text-center">
+                    <h3>Oops! Something went wrong.</h3>
+                    <p>Please try again later or contact us directly.</p>
+                    <t t-if="error">
+                        <p class="text-muted"><t t-esc="error"/></p>
+                    </t>
+                    <a href="/" class="btn btn-primary mt-3">Return to Homepage</a>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,989 @@
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daffodil Educational Network - Transforming Lives Through Excellence</title>
+    <style>
+        /* Global Resets and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        .den-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .den-nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .den-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .den-nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .den-nav-menu a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+            font-weight: 500;
+        }
+
+        .den-nav-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .den-cta-header {
+            background: #ff6b35;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .den-cta-header:hover {
+            background: #e55a2e;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .den-hero {
+            background: linear-gradient(rgba(30, 60, 114, 0.85), rgba(42, 82, 152, 0.85)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice"><rect fill="%23f0f8ff" width="1200" height="800"/><g fill="%23e6f3ff" opacity="0.6"><path d="M0 600L80 580L160 610L240 570L320 620L400 560L480 630L560 550L640 640L720 540L800 650L880 530L960 660L1040 520L1120 670L1200 510L1200 800L0 800Z"/><path d="M0 200L100 250L200 180L300 280L400 150L500 300L600 120L700 320L800 100L900 350L1000 80L1100 380L1200 50L1200 0L0 0Z" opacity="0.4"/></g></svg>') no-repeat center center;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding-top: 80px;
+            padding-bottom: 4rem;
+        }
+
+        .den-hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .den-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 3.8rem);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .den-hero p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            margin-bottom: 2.5rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.9;
+        }
+
+        .den-hero-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: clamp(1.5rem, 4vw, 3rem);
+            margin: 2.5rem 0;
+        }
+
+        .den-stat {
+            text-align: center;
+        }
+
+        .den-stat-number {
+            font-size: clamp(2rem, 4vw, 2.8rem);
+            font-weight: bold;
+            color: #ff6b35;
+        }
+
+        .den-stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        .den-hero-ctas {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .den-cta-primary, .den-form-submit {
+            background: #ff6b35;
+            color: white;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+         .den-cta-primary:hover, .den-form-submit:hover {
+            background: #e55a2e;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .den-cta-secondary {
+            background: transparent;
+            color: white;
+            padding: 0.9rem 2rem;
+            border: 2px solid white;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .den-cta-secondary:hover {
+            background: white;
+            color: #1e3c72;
+        }
+
+        /* General Container & Section Styling */
+        .den-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .den-section {
+            padding: 4rem 0;
+        }
+
+        .den-section-title {
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            margin-bottom: 1rem;
+            color: #1e3c72;
+            font-weight: 700;
+        }
+
+        .den-section-subtitle {
+            text-align: center;
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            color: #555;
+            margin-bottom: 3rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+
+        /* Educational Ecosystem */
+        .den-ecosystem {
+            background: #f8f9fa;
+        }
+        .den-institutions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .den-institution-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 5px solid #ff6b35;
+        }
+        .den-institution-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        }
+        .den-institution-card h3 {
+            color: #1e3c72;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+        .den-institution-type {
+            color: #ff6b35;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .den-ecosystem-cta {
+            text-align: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            margin-top: 3rem;
+        }
+        .den-ecosystem-cta h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Impact Section */
+        .den-impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .den-impact-card {
+            text-align: center;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .den-impact-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff6b35;
+            margin-bottom: 0.5rem;
+        }
+        .den-impact-label {
+            color: #1e3c72;
+            font-weight: bold;
+        }
+        .den-impact-cta {
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            color: white;
+            padding: 3rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        /* Research Section */
+        .den-research { background: #f8f9fa; }
+        .den-research-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .den-research-card {
+            background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .den-research-card h4 { color: #1e3c72; margin-bottom: 1rem; font-size: 1.25rem; }
+        .den-research-cta {
+            background: #1e3c72; color: white; padding: 3rem; border-radius: 15px; text-align: center;
+        }
+
+        /* Partnership Section */
+        .den-partnership {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        .den-partnership .den-section-title, .den-partnership .den-section-subtitle {
+            color: #fff;
+        }
+        .den-partnership-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        .den-partnership-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+        .den-partnership-card h4 {
+            margin-bottom: 1rem; color: #fff; font-size: 1.3rem;
+        }
+        .den-partnership-card ul {
+            list-style: none; margin: 1rem 0; padding: 0; flex-grow: 1;
+        }
+        .den-partnership-card li {
+            margin: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #fff;
+        }
+        .den-partnership-card li:before {
+            content: "✓"; position: absolute; left: 0; color: #ffd700; font-weight: bold;
+        }
+        .den-partnership-card .den-cta-secondary { margin-top: auto; }
+
+        /* Footer */
+        .den-footer {
+            background: #1a1a1a; color: white; padding: 3rem 0 1rem;
+        }
+        .den-footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .den-footer-section h4 { color: #ff6b35; margin-bottom: 1rem; }
+        .den-footer-section ul { list-style: none; padding: 0; }
+        .den-footer-section a { color: #ccc; text-decoration: none; line-height: 1.8; }
+        .den-footer-section a:hover { color: #ff6b35; }
+        .den-footer-bottom {
+            border-top: 1px solid #333; padding-top: 1.5rem; text-align: center; color: #999; font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .den-modal {
+            display: none; position: fixed; z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            align-items: center; justify-content: center;
+        }
+        .den-modal-content {
+            background-color: #fff;
+            padding: 0; border-radius: 15px;
+            width: 90%; max-width: 600px;
+            max-height: 90vh;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .den-modal-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white; padding: 1.5rem 2rem;
+            border-radius: 15px 15px 0 0; text-align: center; position: relative;
+        }
+        .den-modal-header h3 { margin: 0; font-size: 1.8rem; }
+        .den-modal-header p { font-size: 0.9rem; opacity: 0.9; margin-top: 0.5rem; margin-bottom: 0; }
+        .den-close {
+            color: white; position: absolute; top: 15px; right: 20px;
+            font-size: 2rem; font-weight: bold; cursor: pointer; line-height: 1;
+            transition: opacity 0.2s;
+        }
+        .den-close:hover { opacity: 0.7; }
+        .den-modal-body {
+            padding: 2rem; overflow-y: auto; flex-grow: 1;
+        }
+
+        /* Form Styles */
+        .den-partnership-form { display: flex; flex-direction: column; gap: 1.5rem; }
+        .den-form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .den-form-group label { font-weight: bold; color: #1e3c72; font-size: 0.95rem; }
+        .den-form-group input,
+        .den-form-group select,
+        .den-form-group textarea {
+            padding: 0.9rem; border: 1px solid #ddd;
+            border-radius: 8px; font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #fdfdfd;
+        }
+        .den-form-group input:focus,
+        .den-form-group select:focus,
+        .den-form-group textarea:focus {
+            outline: none; border-color: #ff6b35;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.2);
+        }
+        .den-form-group textarea { min-height: 100px; resize: vertical; }
+        .den-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+        /* Required field indicator */
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .den-nav-menu { display: none; }
+        }
+        @media (max-width: 768px) {
+            .den-hero h1 { font-size: 2.2rem; }
+            .den-hero-stats { flex-direction: column; gap: 1.5rem;}
+            .den-nav-container { padding: 0 1rem; }
+            .den-section { padding: 3rem 0; }
+            .den-form-row { grid-template-columns: 1fr; gap: 1.2rem; }
+            .den-modal-content { margin: 5% auto; width: 95%; max-height: 95vh; }
+            .den-modal-header { padding: 1.2rem 1.5rem; }
+            .den-modal-header h3 { font-size: 1.5rem; }
+            .den-modal-body { padding: 1.5rem; }
+            .den-footer-content { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        }
+        @media (max-width: 480px) {
+            .den-hero-ctas { flex-direction: column; gap: 0.8rem; align-items: center;}
+            .den-hero-ctas .den-cta-primary, .den-hero-ctas .den-cta-secondary { width: 80%; text-align: center;}
+            .den-logo { font-size: 1.2rem;}
+            .den-cta-header { padding: 0.6rem 1rem; font-size: 0.9rem;}
+        }
+    </style>
+    <script>
+        // Globally define functions needed by inline onclick handlers
+        function openForm(type) {
+            const modals = {
+                'partnership': 'denPartnershipModal',
+                'donation': 'denDonationModal',
+                'collaboration': 'denCollaborationModal'
+            };
+            const modalId = modals[type];
+            if (modalId) {
+                const modalElement = document.getElementById(modalId);
+                if (modalElement) {
+                    modalElement.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    console.error('Modal element not found for ID:', modalId);
+                }
+            } else {
+                console.error('Unknown modal type:', type);
+            }
+        }
+
+        function closeForm(type) {
+            const modals = {
+                'partnership': 'denPartnershipModal',
+                'donation': 'denDonationModal',
+                'collaboration': 'denCollaborationModal'
+            };
+            const modalId = modals[type];
+            if (modalId) {
+                const modalElement = document.getElementById(modalId);
+                if (modalElement) {
+                    modalElement.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                } else {
+                    console.error('Modal element not found for ID:', modalId);
+                }
+            } else {
+                console.error('Unknown modal type:', type);
+            }
+        }
+    </script>
+
+    <header class="den-header">
+        <div class="den-nav-container">
+            <div class="den-logo">Daffodil Educational Network</div>
+            <nav>
+                <ul class="den-nav-menu">
+                    <li><a href="#den-home">Home</a></li>
+                    <li><a href="#den-institutions">Institutions</a></li>
+                    <li><a href="#den-research">Research</a></li>
+                    <li><a href="#den-partnerships">Partnerships</a></li>
+                    <li><a href="#den-footer">Contact</a></li>
+                </ul>
+            </nav>
+            <button class="den-cta-header" id="denHeaderSupportCta">Support Our Mission</button>
+        </div>
+    </header>
+    
+    <section class="den-section den-research" id="den-research">
+        <div class="den-research-cta">
+            <h3>Fund Breakthrough Research</h3>
+            <p>Support the next generation of discoveries that will shape the future of technology and society.</p>
+            <button class="den-cta-primary" style="margin-top: 1rem;" id="denResearchCtaSupport">Support Innovation</button>
+        </div>
+    </section>
+
+    <section class="den-section den-partnership" id="den-partnerships">
+        <div class="den-container">
+            <h2 class="den-section-title">Partnership Opportunities</h2>
+            <p class="den-section-subtitle">Join us in shaping the future of education through strategic collaboration.</p>
+            <div class="den-partnership-options">
+                <div class="den-partnership-card">
+                    <h4>Corporate Partnerships</h4>
+                    <ul><li>Research collaboration</li><li>Talent pipeline development</li><li>Infrastructure sponsorship</li><li>Technology transfer</li></ul>
+                    <button class="den-cta-secondary" onclick="openForm('partnership')">Become a Partner</button>
+                </div>
+                <div class="den-partnership-card">
+                    <h4>Individual Donations</h4>
+                    <ul><li>Scholarship funds</li><li>Research grants</li><li>Infrastructure development</li><li>Endowment opportunities</li></ul>
+                    <button class="den-cta-secondary" onclick="openForm('donation')">Make a Donation</button>
+                </div>
+                <div class="den-partnership-card">
+                    <h4>Institutional Collaboration</h4>
+                    <ul><li>Joint program development</li><li>Faculty exchange</li><li>Capacity building</li><li>Policy research</li></ul>
+                    <button class="den-cta-secondary" onclick="openForm('collaboration')">Collaborate</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="den-footer" id="den-footer">
+        <div class="den-container">
+            <div class="den-footer-content">
+                <div class="den-footer-section">
+                    <h4>Ways to Support</h4>
+                    <ul>
+                        <li><a href="javascript:void(0)" onclick="openForm('donation')">Make a Donation</a></li>
+                        <li><a href="javascript:void(0)" onclick="openForm('partnership')">Corporate Partnership</a></li>
+                        <li><a href="#den-research">Research Funding</a></li>
+                        <li><a href="javascript:void(0)" onclick="openForm('donation')">Scholarship Programs</a></li>
+                    </ul>
+                </div>
+                <div class="den-footer-section">
+                    <h4>Our Institutions</h4>
+                    <ul>
+                        <li><a href="#den-institutions">Daffodil Intl. University</a></li>
+                        <li><a href="#den-institutions">Daffodil Institute of IT</a></li>
+                        <li><a href="#den-institutions">Asian Inst. of Business</a></li>
+                        <li><a href="#den-institutions">View All Institutions</a></li>
+                    </ul>
+                </div>
+                <div class="den-footer-section">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="#den-research">Research Projects</a></li>
+                        <li><a href="#den-research">Innovation Labs</a></li>
+                        <li><a href="#den-partnerships">Industry Collaboration</a></li>
+                        <li><a href="#den-home">About Us (Overview)</a></li>
+                    </ul>
+                </div>
+                <div class="den-footer-section">
+                    <h4>Contact Partnership Team</h4>
+                    <p style="font-size:0.9em; margin-bottom:0.5rem;">Email: partnerships@daffodil-network.edu<br>Phone: +880-2-123-4567<br>Address: Dhaka, Bangladesh</p>
+                    <button class="den-cta-primary" style="margin-top: 0.5rem; padding: 0.7rem 1.5rem; font-size:0.95rem;" id="denFooterScheduleMeeting">Schedule Meeting</button>
+                </div>
+            </div>
+            <div class="den-footer-bottom">
+                <p>© <span id="denCurrentYear"></span> Daffodil Educational Network. All rights reserved. | Building Excellence in Education</p>
+            </div>
+        </div>
+    </footer>
+
+    
+    <div id="denPartnershipModal" class="den-modal">
+        <div class="den-modal-content">
+            <div class="den-modal-header">
+                <span class="den-close" onclick="closeForm('partnership')">×</span>
+                <h3>Corporate Partnership</h3>
+                <p>Join our network of educational excellence</p>
+            </div>
+            <div class="den-modal-body">
+                <form class="den-partnership-form" action="/website_form/partnership.inquiry" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="request.csrf_token()">
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_p_company_name">Company Name</label>
+                            <input type="text" id="den_p_company_name" name="company_name" required="">
+                        </div>
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_p_contact_person">Contact Person</label>
+                            <input type="text" id="den_p_contact_person" name="contact_person" required="">
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_p_email">Email Address</label>
+                            <input type="email" id="den_p_email" name="email" required="">
+                        </div>
+                        <div class="den-form-group">
+                            <label for="den_p_phone">Phone Number</label>
+                            <input type="tel" id="den_p_phone" name="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_p_partnership_type">Partnership Interest</label>
+                            <select id="den_p_partnership_type" name="partnership_type" required="">
+                                <option value="">Select Type</option>
+                                <option value="research">Research Collaboration</option>
+                                <option value="talent">Talent Pipeline</option>
+                                <option value="infra">Infrastructure</option>
+                                <option value="tech">Tech Transfer</option>
+                                <option value="multi">Multiple Areas</option>
+                            </select>
+                        </div>
+                        <div class="den-form-group">
+                            <label for="den_p_company_size">Company Size</label>
+                            <select id="den_p_company_size" name="company_size">
+                                <option value="">Select Size</option>
+                                <option value="startup">Startup (1-50)</option>
+                                <option value="medium">Medium (51-500)</option>
+                                <option value="large">Large (500+)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-group">
+                        <label for="den_p_industry">Industry/Sector</label>
+                        <input type="text" id="den_p_industry" name="industry" placeholder="e.g. Technology, Healthcare">
+                    </div>
+                    
+                    <div class="den-form-group">
+                        <label for="den_p_goals">Partnership Goals</label>
+                        <textarea id="den_p_goals" name="partnership_goals" rows="4" placeholder="Describe your objectives..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="den-form-submit">Submit Partnership Application</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="denDonationModal" class="den-modal">
+        <div class="den-modal-content">
+            <div class="den-modal-header">
+                <span class="den-close" onclick="closeForm('donation')">×</span>
+                <h3>Make a Donation</h3>
+                <p>Invest in the future of education</p>
+            </div>
+            <div class="den-modal-body">
+                <form class="den-partnership-form" action="/website_form/donation.inquiry" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="request.csrf_token()">
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_d_donor_name">Full Name/Organization</label>
+                            <input type="text" id="den_d_donor_name" name="donor_name" required="">
+                        </div>
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_d_donor_email">Email Address</label>
+                            <input type="email" id="den_d_donor_email" name="email" required="">
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label for="den_d_donor_phone">Phone Number</label>
+                            <input type="tel" id="den_d_donor_phone" name="phone">
+                        </div>
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_d_donation_type">Donation For</label>
+                            <select id="den_d_donation_type" name="donation_type" required="">
+                                <option value="">Select Purpose</option>
+                                <option value="scholarship">Scholarship</option>
+                                <option value="research">Research Grant</option>
+                                <option value="infra">Infrastructure</option>
+                                <option value="endow">Endowment</option>
+                                <option value="general">General Support</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label for="den_d_amount">Intended Amount</label>
+                            <select id="den_d_amount" name="amount_range">
+                                <option value="">Not specified</option>
+                                <option value="1k-5k">$1k - $5k</option>
+                                <option value="5k-10k">$5k - $10k</option>
+                                <option value="10k-25k">$10k - $25k</option>
+                                <option value="25k+">$25k+</option>
+                            </select>
+                        </div>
+                        <div class="den-form-group">
+                            <label for="den_d_recognition">Recognition Preference</label>
+                            <select id="den_d_recognition" name="recognition">
+                                <option value="public">Public Recognition</option>
+                                <option value="anon">Anonymous</option>
+                                <option value="discuss">Discuss Later</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-group">
+                        <label for="den_d_interest_areas">Specific Areas of Interest</label>
+                        <textarea id="den_d_interest_areas" name="interest_areas" rows="4" placeholder="Any specific programs or initiatives..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="den-form-submit">Submit Donation Inquiry</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="denCollaborationModal" class="den-modal">
+        <div class="den-modal-content">
+            <div class="den-modal-header">
+                <span class="den-close" onclick="closeForm('collaboration')">×</span>
+                <h3>Institutional Collaboration</h3>
+                <p>Partner with us for academic excellence</p>
+            </div>
+            <div class="den-modal-body">
+                <form class="den-partnership-form" action="/website_form/collaboration.inquiry" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="request.csrf_token()">
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_c_inst_name">Institution Name</label>
+                            <input type="text" id="den_c_inst_name" name="institution_name" required="">
+                        </div>
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_c_contact_name">Contact Person</label>
+                            <input type="text" id="den_c_contact_name" name="contact_name" required="">
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_c_email">Email Address</label>
+                            <input type="email" id="den_c_email" name="email" required="">
+                        </div>
+                        <div class="den-form-group">
+                            <label for="den_c_phone">Phone Number</label>
+                            <input type="tel" id="den_c_phone" name="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-row">
+                        <div class="den-form-group">
+                            <label class="required-field" for="den_c_collab_type">Collaboration Interest</label>
+                            <select id="den_c_collab_type" name="collaboration_type" required="">
+                                <option value="">Select Type</option>
+                                <option value="joint_prog">Joint Program</option>
+                                <option value="faculty_ex">Faculty Exchange</option>
+                                <option value="capacity">Capacity Building</option>
+                                <option value="policy_res">Policy Research</option>
+                                <option value="student_ex">Student Exchange</option>
+                                <option value="multi">Multiple Areas</option>
+                            </select>
+                        </div>
+                        <div class="den-form-group">
+                            <label for="den_c_inst_type">Institution Type</label>
+                            <select id="den_c_inst_type" name="institution_type">
+                                <option value="">Select Type</option>
+                                <option value="uni">University</option>
+                                <option value="research_inst">Research Institute</option>
+                                <option value="gov">Govt. Agency</option>
+                                <option value="ngo">NGO/Non-Profit</option>
+                                <option value="intl_org">Intl. Organization</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="den-form-group">
+                        <label for="den_c_country">Country/Region</label>
+                        <input type="text" id="den_c_country" name="country" placeholder="e.g. Bangladesh, UAE">
+                    </div>
+                    
+                    <div class="den-form-group">
+                        <label for="den_c_scope">Collaboration Scope</label>
+                        <textarea id="den_c_scope" name="scope" rows="4" placeholder="Describe your collaboration interests..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="den-form-submit">Submit Collaboration Proposal</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const FIXED_HEADER_HEIGHT = document.querySelector('.den-header')?.offsetHeight || 80;
+
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#den-"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                        const offsetPosition = elementPosition - FIXED_HEADER_HEIGHT;
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Header scroll effect
+            const header = document.querySelector('.den-header');
+            if (header) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 50) {
+                        header.style.background = 'rgba(30, 60, 114, 0.97)';
+                        header.style.backdropFilter = 'blur(8px)';
+                        header.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
+                    } else {
+                        header.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+                        header.style.backdropFilter = 'none';
+                        header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                    }
+                });
+            }
+
+            // Specific CTA button handlers
+            const setupCta = (id, formType, actionType = 'openForm', target = null) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('click', () => {
+                        if (actionType === 'openForm' && formType) {
+                            openForm(formType);
+                        } else if (actionType === 'scroll' && target) {
+                             const targetElement = document.querySelector(target);
+                             if (targetElement) {
+                                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                                const offsetPosition = elementPosition - FIXED_HEADER_HEIGHT;
+                                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                             }
+                        }
+                    });
+                }
+            };
+            setupCta('denHeaderSupportCta', 'donation');
+            setupCta('denHeroCtaPartner', 'partnership');
+            setupCta('denHeroCtaExplore', null, 'scroll', '#den-partnerships');
+            setupCta('denEcosystemCtaInvest', 'donation');
+            setupCta('denImpactCtaDifference', 'donation');
+            setupCta('denResearchCtaSupport', 'donation');
+            setupCta('denFooterScheduleMeeting', 'partnership');
+
+            // Modal: Close on outside click
+            document.querySelectorAll('.den-modal').forEach(modal => {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        let modalType = '';
+                        if (modal.id === 'denPartnershipModal') modalType = 'partnership';
+                        else if (modal.id === 'denDonationModal') modalType = 'donation';
+                        else if (modal.id === 'denCollaborationModal') modalType = 'collaboration';
+                        if (modalType) closeForm(modalType);
+                    }
+                });
+            });
+            
+            // Form validation and submission handling
+            document.querySelectorAll('.den-partnership-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    // Basic client-side validation
+                    const requiredFields = form.querySelectorAll('[required]');
+                    let isValid = true;
+                    
+                    requiredFields.forEach(field => {
+                        if (!field.value.trim()) {
+                            isValid = false;
+                            field.style.borderColor = 'red';
+                        } else {
+                            field.style.borderColor = '#ddd';
+                        }
+                    });
+
+                    if (!isValid) {
+                        e.preventDefault();
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+
+                    // Email validation
+                    const emailFields = form.querySelectorAll('input[type="email"]');
+                    emailFields.forEach(field => {
+                        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (field.value && !emailPattern.test(field.value)) {
+                            isValid = false;
+                            field.style.borderColor = 'red';
+                            e.preventDefault();
+                            alert('Please enter a valid email address.');
+                        }
+                    });
+
+                    // Note: In production with Odoo, you might want to remove the preventDefault()
+                    // and let Odoo handle the form submission. The alert below is for demonstration.
+                    if (isValid) {
+                        // For demonstration purposes - remove in production
+                        // e.preventDefault();
+                        // alert('Form submitted successfully! We will contact you soon.');
+                        
+                        // Optionally close modal after successful submission
+                        // const modal = this.closest('.den-modal');
+                        // if (modal) {
+                        //     let modalType = '';
+                        //     if (modal.id === 'denPartnershipModal') modalType = 'partnership';
+                        //     else if (modal.id === 'denDonationModal') modalType = 'donation';
+                        //     else if (modal.id === 'denCollaborationModal') modalType = 'collaboration';
+                        //     if (modalType) closeForm(modalType);
+                        // }
+                    }
+                });
+            });
+
+            // Real-time email validation
+            const emailInputs = document.querySelectorAll('input[type="email"]');
+            emailInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(this.value) && this.value) {
+                        this.style.borderColor = 'red';
+                    } else {
+                        this.style.borderColor = '#ddd';
+                    }
+                });
+            });
+
+            // Phone number formatting
+            const phoneInputs = document.querySelectorAll('input[type="tel"]');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^\d+\-\s]/g, '');
+                });
+            });
+
+            // Animate impact numbers (if they exist on the page)
+            const impactNumbers = document.querySelectorAll('.den-impact-number');
+            if (impactNumbers.length > 0) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const counter = entry.target;
+                            const targetText = counter.textContent || '';
+                            const suffix = targetText.includes('%') ? '%' : (targetText.includes('+') ? '+' : '');
+                            const target = parseInt(targetText.replace(/\D/g, ''));
+                            
+                            if (isNaN(target) || counter.dataset.animated) {
+                                obs.unobserve(counter); return;
+                            }
+                            counter.dataset.animated = true;
+
+                            let current = 0;
+                            const duration = 1500; const steps = 50;
+                            const increment = target / steps; const stepDuration = duration / steps;
+
+                            const timer = setInterval(() => {
+                                current += increment;
+                                if (current >= target) {
+                                    counter.textContent = target + suffix; clearInterval(timer);
+                                } else {
+                                    counter.textContent = Math.ceil(current) + suffix;
+                                }
+                            }, stepDuration);
+                            obs.unobserve(counter);
+                        }
+                    });
+                }, { threshold: 0.5 });
+                impactNumbers.forEach(counter => observer.observe(counter));
+            }
+            
+            // Set current year in footer
+            const yearSpan = document.getElementById('denCurrentYear');
+            if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+        });
+    </script>

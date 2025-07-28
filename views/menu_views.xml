@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_forms_dashboard_root"
+              name="Forms Dashboard"
+              web_icon="forms_dashboard,static/description/icon.png"
+              sequence="100"/>
+
+    <!-- Dashboard Menu -->
+    <menuitem id="menu_forms_dashboard_main"
+              name="Dashboard"
+              parent="menu_forms_dashboard_root"
+              action="action_forms_dashboard_main"
+              sequence="1"/>
+
+    <!-- Inquiries Menu -->
+    <menuitem id="menu_forms_inquiries"
+              name="Inquiries"
+              parent="menu_forms_dashboard_root"
+              sequence="2"/>
+
+    <!-- Inquiry Type Menus -->
+    <menuitem id="menu_partnership_inquiry"
+              name="Partnership Inquiries"
+              parent="menu_forms_inquiries"
+              action="action_partnership_inquiry"
+              sequence="1"/>
+
+    <menuitem id="menu_donation_inquiry"
+              name="Donation Inquiries"
+              parent="menu_forms_inquiries"
+              action="action_donation_inquiry"
+              sequence="2"/>
+
+    <menuitem id="menu_collaboration_inquiry"
+              name="Collaboration Inquiries"
+              parent="menu_forms_inquiries"
+              action="action_collaboration_inquiry"
+              sequence="3"/>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Partnership Inquiries -->
+        <record id="seq_partnership_inquiry" model="ir.sequence">
+            <field name="name">Partnership Inquiry</field>
+            <field name="code">partnership.inquiry</field>
+            <field name="prefix">PART/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Donation Inquiries -->
+        <record id="seq_donation_inquiry" model="ir.sequence">
+            <field name="name">Donation Inquiry</field>
+            <field name="code">donation.inquiry</field>
+            <field name="prefix">DON/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Collaboration Inquiries -->
+        <record id="seq_collaboration_inquiry" model="ir.sequence">
+            <field name="name">Collaboration Inquiry</field>
+            <field name="code">collaboration.inquiry</field>
+            <field name="prefix">COLLAB/%(year)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>
