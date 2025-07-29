@@ -3,7 +3,6 @@
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { Component, onWillStart, useState, onMounted, useRef, onWillDestroy } from "@odoo/owl";
-import { session } from "@web/session";
 
 export class FormsDashboard extends Component {
     setup() {
@@ -13,10 +12,16 @@ export class FormsDashboard extends Component {
         this.trendChartRef = useRef("trendChart");
         this.statusChartRef = useRef("statusChart");
 
-        // Store refresh interval ID
+        // Store intervals
         this.refreshInterval = null;
         
-        // Initialize with static values
+        // Chart instances
+        this.charts = {
+            trend: null,
+            status: null
+        };
+        
+        // Initialize state
         this.state = useState({
             partnerships: 0,
             partnerships_new: 0,
@@ -29,60 +34,73 @@ export class FormsDashboard extends Component {
             lastUpdate: this.formatDate(new Date()),
             dateRange: 7,
             statusFilter: 'all',
-            charts: {},
-            trendPeriod: 'daily',
-            currentUser: 'Krishanu-Kabir-Sparsha',
-            currentDateTime: this.formatUTCDateTime(new Date())
+            trendPeriod: 'daily'
         });
-        
-        // Add these at the top of setup
-        let timeInterval;
         
         onWillStart(async () => {
             await this.loadData();
-            // Update time every second
-            timeInterval = setInterval(() => {
-                this.state.currentDateTime = this.formatUTCDateTime(new Date());
-            }, 1000);
         });
 
         onMounted(async () => {
-            await new Promise(resolve => setTimeout(resolve, 300));
-            await this.setupCharts();
+            // Ensure Chart.js is loaded
+            await this.waitForChartJs();
+            
+            // Use requestAnimationFrame to ensure DOM is ready
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    this.initializeCharts();
+                }, 100);
+            });
             
             // Auto refresh every 5 minutes
             this.refreshInterval = setInterval(() => this.refresh(), 300000);
         });
 
-        // Use onWillDestroy for cleanup
         onWillDestroy(() => {
+            // Clear interval
             if (this.refreshInterval) {
                 clearInterval(this.refreshInterval);
                 this.refreshInterval = null;
             }
-            if (timeInterval) {
-                clearInterval(timeInterval);
-            }
-            // Cleanup charts
-            if (this.state.charts.trend) {
-                this.state.charts.trend.destroy();
-                this.state.charts.trend = null;
-            }
-            if (this.state.charts.status) {
-                this.state.charts.status.destroy();
-                this.state.charts.status = null;
-            }
+            
+            // Destroy charts
+            this.destroyCharts();
         });
     }
 
-    formatUTCDateTime(date) {
-        const year = date.getUTCFullYear();
-        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(date.getUTCDate()).padStart(2, '0');
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    async waitForChartJs() {
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max
+        
+        while (typeof window.Chart === 'undefined' && attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (typeof window.Chart === 'undefined') {
+            console.error('Chart.js not available');
+            throw new Error('Chart.js failed to load');
+        }
+    }
+
+    destroyCharts() {
+        if (this.charts.trend) {
+            try {
+                this.charts.trend.destroy();
+            } catch (e) {
+                // Ignore errors
+            }
+            this.charts.trend = null;
+        }
+        
+        if (this.charts.status) {
+            try {
+                this.charts.status.destroy();
+            } catch (e) {
+                // Ignore errors
+            }
+            this.charts.status = null;
+        }
     }
 
     formatDate(date) {
@@ -97,92 +115,73 @@ export class FormsDashboard extends Component {
         });
     }
 
-    async setupCharts() {
+    async initializeCharts() {
         try {
-            // Wait longer for DOM to be fully ready
-            await new Promise(resolve => setTimeout(resolve, 300));
-            
-            // Ensure trendPeriod is set to daily initially
-            this.state.trendPeriod = 'daily';
-            
-            // Get initial data before creating charts
+            // Check if refs are available
+            if (!this.trendChartRef.el || !this.statusChartRef.el) {
+                console.error('Chart containers not available');
+                // Retry once more after delay
+                setTimeout(() => this.initializeCharts(), 500);
+                return;
+            }
+
+            // Get initial data
             const [trendData, statusData] = await Promise.all([
                 this.getTrendData(),
                 this.getStatusDistribution()
             ]);
             
-            // Initialize charts
-            await this.initCharts(trendData, statusData);
+            // Create charts
+            this.createCharts(trendData, statusData);
+            
         } catch (error) {
-            console.error('Error setting up charts:', error);
+            console.error('Error initializing charts:', error);
         }
     }
 
-    async initCharts(trendData, statusData) {
-        try {
-            if (typeof Chart === 'undefined') {
-                throw new Error('Chart.js not loaded');
-            }
-
-            const trendCanvas = this.trendChartRef.el;
-            const statusCanvas = this.statusChartRef.el;
-
-            if (!trendCanvas || !statusCanvas) {
-                throw new Error('Canvas elements not found');
-            }
-
-            // Clean up existing charts
-            if (this.state.charts.trend) {
-                this.state.charts.trend.destroy();
-                this.state.charts.trend = null;
-            }
-            if (this.state.charts.status) {
-                this.state.charts.status.destroy();
-                this.state.charts.status = null;
-            }
-
-            // Wait for a frame to ensure canvas is ready
-            await new Promise(resolve => requestAnimationFrame(resolve));
-
-            const createTrendChart = () => {
-                const ctx = trendCanvas.getContext('2d');
-                if (!ctx) return null;
-                
-                return new Chart(ctx, {
+    createCharts(trendData, statusData) {
+        // Destroy existing charts
+        this.destroyCharts();
+        
+        // Create trend chart
+        const trendCanvas = this.trendChartRef.el;
+        if (trendCanvas) {
+            const trendCtx = trendCanvas.getContext('2d');
+            if (trendCtx) {
+                this.charts.trend = new window.Chart(trendCtx, {
                     type: 'line',
                     data: {
-                        labels: trendData.labels,
+                        labels: trendData.labels || [],
                         datasets: [
                             {
                                 label: 'Partnerships',
                                 borderColor: '#714B67',
-                                backgroundColor: '#714B67',
-                                data: trendData.datasets[0].data,
+                                backgroundColor: 'rgba(113, 75, 103, 0.1)',
+                                data: trendData.datasets[0].data || [],
                                 tension: 0.4,
-                                fill: false
+                                fill: true
                             },
                             {
                                 label: 'Donations',
                                 borderColor: '#00A09D',
-                                backgroundColor: '#00A09D',
-                                data: trendData.datasets[1].data,
+                                backgroundColor: 'rgba(0, 160, 157, 0.1)',
+                                data: trendData.datasets[1].data || [],
                                 tension: 0.4,
-                                fill: false
+                                fill: true
                             },
                             {
                                 label: 'Collaborations',
                                 borderColor: '#28a745',
-                                backgroundColor: '#28a745',
-                                data: trendData.datasets[2].data,
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                data: trendData.datasets[2].data || [],
                                 tension: 0.4,
-                                fill: false
+                                fill: true
                             }
                         ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: false,
                         interaction: {
                             intersect: false,
                             mode: 'index'
@@ -194,10 +193,6 @@ export class FormsDashboard extends Component {
                                     usePointStyle: true,
                                     padding: 20
                                 }
-                            },
-                            tooltip: {
-                                mode: 'index',
-                                intersect: false
                             }
                         },
                         scales: {
@@ -210,18 +205,20 @@ export class FormsDashboard extends Component {
                         }
                     }
                 });
-            };
-
-            const createStatusChart = () => {
-                const ctx = statusCanvas.getContext('2d');
-                if (!ctx) return null;
-
-                return new Chart(ctx, {
+            }
+        }
+        
+        // Create status chart
+        const statusCanvas = this.statusChartRef.el;
+        if (statusCanvas) {
+            const statusCtx = statusCanvas.getContext('2d');
+            if (statusCtx) {
+                this.charts.status = new window.Chart(statusCtx, {
                     type: 'doughnut',
                     data: {
                         labels: ['New', 'In Progress', 'Qualified', 'Done', 'Cancelled', 'Declined', 'Converted'],
                         datasets: [{
-                            data: statusData,
+                            data: statusData || [],
                             backgroundColor: [
                                 '#714B67',
                                 '#00A09D',
@@ -230,30 +227,26 @@ export class FormsDashboard extends Component {
                                 '#dc3545',
                                 '#fd7e14',
                                 '#20c997'
-                            ]
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: false,
                         plugins: {
                             legend: {
                                 position: 'bottom',
                                 labels: {
-                                    padding: 20
+                                    padding: 20,
+                                    usePointStyle: true
                                 }
                             }
                         }
                     }
                 });
-            };
-
-            this.state.charts.trend = createTrendChart();
-            this.state.charts.status = createStatusChart();
-
-        } catch (error) {
-            console.error('Error initializing charts:', error);
+            }
         }
     }
 
@@ -283,13 +276,6 @@ export class FormsDashboard extends Component {
                         return d.toLocaleDateString('en-US', { month: 'short' });
                     });
                     break;
-                default:
-                    days = 7;
-                    labels = Array.from({length: 7}, (_, i) => {
-                        const d = new Date();
-                        d.setDate(d.getDate() - (6 - i));
-                        return d.toLocaleDateString('en-US', { weekday: 'short' });
-                    });
             }
 
             const domain = [['create_date', '>=', this.getDateRangeDomain(days)]];
@@ -300,16 +286,12 @@ export class FormsDashboard extends Component {
                 this.orm.searchRead('collaboration.inquiry', domain, ['create_date'])
             ]);
 
-            const partnershipData = this.groupDataByPeriod(partnerships, period, labels.length);
-            const donationData = this.groupDataByPeriod(donations, period, labels.length);
-            const collaborationData = this.groupDataByPeriod(collaborations, period, labels.length);
-
             return {
                 labels,
                 datasets: [
-                    { data: partnershipData },
-                    { data: donationData },
-                    { data: collaborationData }
+                    { data: this.groupDataByPeriod(partnerships, period, labels.length) },
+                    { data: this.groupDataByPeriod(donations, period, labels.length) },
+                    { data: this.groupDataByPeriod(collaborations, period, labels.length) }
                 ]
             };
         } catch (error) {
@@ -323,26 +305,33 @@ export class FormsDashboard extends Component {
 
     groupDataByPeriod(records, period, length) {
         const data = new Array(length).fill(0);
+        const now = new Date();
         
         records.forEach(record => {
             const date = new Date(record.create_date);
-            let index = 0;
+            let index = -1;
 
             switch(period) {
                 case 'daily':
-                    const dayDiff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
-                    if (dayDiff < 7) index = 6 - dayDiff;
+                    const dayDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+                    if (dayDiff >= 0 && dayDiff < 7) {
+                        index = 6 - dayDiff;
+                    }
                     break;
                     
                 case 'weekly':
-                    const weekDiff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24 * 7));
-                    if (weekDiff < 4) index = 3 - weekDiff;
+                    const weekDiff = Math.floor((now - date) / (1000 * 60 * 60 * 24 * 7));
+                    if (weekDiff >= 0 && weekDiff < 4) {
+                        index = 3 - weekDiff;
+                    }
                     break;
                     
                 case 'monthly':
-                    const monthDiff = new Date().getMonth() - date.getMonth() + 
-                        (new Date().getFullYear() - date.getFullYear()) * 12;
-                    if (monthDiff < 6) index = 5 - monthDiff;
+                    const monthDiff = (now.getFullYear() - date.getFullYear()) * 12 + 
+                        (now.getMonth() - date.getMonth());
+                    if (monthDiff >= 0 && monthDiff < 6) {
+                        index = 5 - monthDiff;
+                    }
                     break;
             }
             
@@ -378,97 +367,16 @@ export class FormsDashboard extends Component {
     async onTrendPeriodChange(ev) {
         try {
             this.state.trendPeriod = ev.target.value;
-            const trendData = await this.getTrendData();
             
-            // Safely destroy the old chart
-            if (this.state.charts.trend) {
-                this.state.charts.trend.destroy();
-                this.state.charts.trend = null;
-            }
-
-            // Get canvas and verify it exists
-            const trendCanvas = this.trendChartRef.el;
-            if (!trendCanvas) {
-                console.error('Trend chart canvas not found');
-                return;
-            }
-
-            // Wait a moment for the DOM to update
-            await new Promise(resolve => setTimeout(resolve, 50));
-
-            // Create new chart
-            const trendCtx = trendCanvas.getContext('2d');
-            if (!trendCtx) {
-                console.error('Could not get 2d context from canvas');
-                return;
-            }
-
-            this.state.charts.trend = new Chart(trendCtx, {
-                type: 'line',
-                data: {
-                    labels: trendData.labels,
-                    datasets: [
-                        {
-                            label: 'Partnerships',
-                            borderColor: '#714B67',
-                            backgroundColor: '#714B67',
-                            data: trendData.datasets[0].data,
-                            tension: 0.4,
-                            fill: false
-                        },
-                        {
-                            label: 'Donations',
-                            borderColor: '#00A09D',
-                            backgroundColor: '#00A09D',
-                            data: trendData.datasets[1].data,
-                            tension: 0.4,
-                            fill: false
-                        },
-                        {
-                            label: 'Collaborations',
-                            borderColor: '#28a745',
-                            backgroundColor: '#28a745',
-                            data: trendData.datasets[2].data,
-                            tension: 0.4,
-                            fill: false
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 0 // Disable animations for smoother updates
-                    },
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                padding: 20
-                            }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
-                        }
-                    }
-                }
-            });
+            const [trendData, statusData] = await Promise.all([
+                this.getTrendData(),
+                this.getStatusDistribution()
+            ]);
+            
+            this.createCharts(trendData, statusData);
+            
         } catch (error) {
-            console.error('Error updating trend chart:', error);
+            console.error('Error updating trend period:', error);
         }
     }
 
@@ -479,12 +387,13 @@ export class FormsDashboard extends Component {
                 this.loadCounts(),
                 this.loadRecentActivity()
             ]);
-            if (this.state.charts.trend && this.state.charts.status) {
+            
+            // Update charts if they exist
+            if (this.charts.trend && this.charts.status) {
                 await this.updateCharts();
             }
+            
             this.state.lastUpdate = this.formatDate(new Date());
-            // Update current date time in UTC format
-            this.state.currentDateTime = this.formatUTCDateTime(new Date());
         } catch (error) {
             console.error("Error loading dashboard data:", error);
         } finally {
@@ -499,32 +408,20 @@ export class FormsDashboard extends Component {
                 this.getStatusDistribution()
             ]);
 
-            if (this.state.charts.trend) {
-                try {
-                    this.state.charts.trend.data.labels = trendData.labels;
-                    this.state.charts.trend.data.datasets.forEach((dataset, index) => {
-                        dataset.data = trendData.datasets[index].data;
-                    });
-                    await this.state.charts.trend.update('none');
-                } catch (error) {
-                    console.error('Error updating trend chart:', error);
-                    // Reinitialize chart if update fails
-                    await this.initCharts(trendData, statusData);
-                }
+            if (this.charts.trend) {
+                this.charts.trend.data.labels = trendData.labels;
+                this.charts.trend.data.datasets.forEach((dataset, index) => {
+                    dataset.data = trendData.datasets[index].data;
+                });
+                this.charts.trend.update('none');
             }
 
-            if (this.state.charts.status) {
-                try {
-                    this.state.charts.status.data.datasets[0].data = statusData;
-                    await this.state.charts.status.update('none');
-                } catch (error) {
-                    console.error('Error updating status chart:', error);
-                    // Reinitialize chart if update fails
-                    await this.initCharts(trendData, statusData);
-                }
+            if (this.charts.status) {
+                this.charts.status.data.datasets[0].data = statusData;
+                this.charts.status.update('none');
             }
         } catch (error) {
-            console.error('Error in updateCharts:', error);
+            console.error('Error updating charts:', error);
         }
     }
 
@@ -540,7 +437,6 @@ export class FormsDashboard extends Component {
             this.orm.searchCount("collaboration.inquiry", domain)
         ]);
 
-        // Get new counts (created in last 24 hours)
         const newDomain = [['create_date', '>=', this.getDateRangeDomain(1)]];
         const [partnerships_new, donations_new, collaborations_new] = await Promise.all([
             this.orm.searchCount("partnership.inquiry", newDomain),
@@ -600,7 +496,7 @@ export class FormsDashboard extends Component {
 
             const allActivities = [
                 ...partnerships.map(p => ({
-                    id: p.id,
+                    id: `partnership_${p.id}`,
                     name: p.name || '',
                     type: 'Partnership',
                     state: p.state || 'new',
@@ -608,7 +504,7 @@ export class FormsDashboard extends Component {
                     create_date: p.create_date,
                 })),
                 ...donations.map(d => ({
-                    id: d.id,
+                    id: `donation_${d.id}`,
                     name: d.name || '',
                     type: 'Donation',
                     state: d.state || 'new',
@@ -616,7 +512,7 @@ export class FormsDashboard extends Component {
                     create_date: d.create_date,
                 })),
                 ...collaborations.map(c => ({
-                    id: c.id,
+                    id: `collaboration_${c.id}`,
                     name: c.name || '',
                     type: 'Collaboration',
                     state: c.state || 'new',
@@ -637,8 +533,6 @@ export class FormsDashboard extends Component {
 
     async refresh() {
         await this.loadData();
-        // Update UTC time after refresh
-        this.state.currentDateTime = this.formatUTCDateTime(new Date());
     }
 
     async onDateRangeChange(ev) {
@@ -658,14 +552,14 @@ export class FormsDashboard extends Component {
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            // Use UTC time for file name
-            const timestamp = this.formatUTCDateTime(new Date()).replace(/[: ]/g, '-');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             
             link.href = url;
             link.setAttribute('download', `forms-dashboard-export-${timestamp}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Error exporting data:", error);
         }
@@ -682,7 +576,7 @@ export class FormsDashboard extends Component {
         
         return [
             headers.join(','),
-            ...rows.map(row => row.join(','))
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
         ].join('\n');
     }
     
@@ -717,9 +611,7 @@ export class FormsDashboard extends Component {
     }
 }
 
-// Add static properties
 FormsDashboard.template = "forms_dashboard.MainDashboard";
 FormsDashboard.components = {};
 
-// Register the component
 registry.category("actions").add("forms_dashboard_main", FormsDashboard);

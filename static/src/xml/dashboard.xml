@@ -2,27 +2,10 @@
 <templates xml:space="preserve">
     <t t-name="forms_dashboard.MainDashboard">
         <div class="forms_dashboard_main">
-            <!-- User Info Section -->
-            <div class="forms_dashboard_header mb-4">
-                <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm">
-                    <div class="d-flex align-items-center">
-                        <i class="fa fa-user-circle fa-2x text-primary me-2"/>
-                        <div>
-                            <div class="fw-bold"><t t-esc="state.currentUser"/></div>
-                            <small class="text-muted">Current User</small>
-                        </div>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-bold"><t t-esc="state.currentDateTime"/></div>
-                        <small class="text-muted">UTC Time</small>
-                    </div>
-                </div>
-            </div>
-
             <!-- Filters Section -->
             <div class="forms_dashboard_filters">
                 <div class="forms_dashboard_filter_group">
-                    <label for="dateRange">Date Range:</label>
+                    <label for="dateRange" class="me-2">Date Range:</label>
                     <select class="form-select" id="dateRange" t-on-change="onDateRangeChange">
                         <option value="7">Last 7 Days</option>
                         <option value="30">Last 30 Days</option>
@@ -31,7 +14,7 @@
                     </select>
                 </div>
                 <div class="forms_dashboard_filter_group">
-                    <label for="statusFilter">Status:</label>
+                    <label for="statusFilter" class="me-2">Status:</label>
                     <select class="form-select" id="statusFilter" t-on-change="onStatusChange">
                         <option value="all">All Status</option>
                         <option value="new">New</option>
@@ -41,6 +24,10 @@
                         <option value="cancelled">Cancelled</option>
                         <option value="declined">Declined</option>
                         <option value="converted">Converted</option>
+                        <option value="committed">Committed</option>
+                        <option value="received">Received</option>
+                        <option value="approved">Approved</option>
+                        <option value="active">Active</option>
                     </select>
                 </div>
                 <button class="btn btn-secondary" t-on-click="exportData">
@@ -58,13 +45,13 @@
                     <div class="forms_dashboard_chart_header">
                         <div class="forms_dashboard_chart_title">Inquiry Trends</div>
                         <select class="form-select form-select-sm" style="width: auto;" t-on-change="onTrendPeriodChange">
-                            <option value="daily" selected="selected">Daily</option>
-                            <option value="weekly">Weekly</option>
-                            <option value="monthly">Monthly</option>
+                            <option value="daily" t-att-selected="state.trendPeriod === 'daily' ? 'selected' : undefined">Daily</option>
+                            <option value="weekly" t-att-selected="state.trendPeriod === 'weekly' ? 'selected' : undefined">Weekly</option>
+                            <option value="monthly" t-att-selected="state.trendPeriod === 'monthly' ? 'selected' : undefined">Monthly</option>
                         </select>
                     </div>
                     <div class="forms_dashboard_chart_container">
-                        <canvas t-ref="trendChart" width="400" height="200"/>
+                        <canvas t-ref="trendChart"></canvas>
                     </div>
                 </div>
                 
@@ -73,7 +60,7 @@
                         <div class="forms_dashboard_chart_title">Status Distribution</div>
                     </div>
                     <div class="forms_dashboard_chart_container">
-                        <canvas t-ref="statusChart" width="400" height="200"/>
+                        <canvas t-ref="statusChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -146,24 +133,26 @@
                                     <td><t t-esc="activity.type"/></td>
                                     <td>
                                         <span t-attf-class="badge badge-#{activity.state}">
-                                            <t t-esc="activity.state"/>
+                                            <t t-esc="activity.state.replace('_', ' ').charAt(0).toUpperCase() + activity.state.replace('_', ' ').slice(1)"/>
                                         </span>
                                     </td>
                                     <td><t t-esc="activity.date"/></td>
                                 </tr>
                             </t>
+                            <tr t-if="!state.recentActivity || state.recentActivity.length === 0">
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    No activities found
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
-                </div>
-                <div t-if="state.recentActivity.length === 0" class="text-center text-muted py-3">
-                    No activities found
                 </div>
             </div>
 
             <!-- Floating Refresh Button -->
-            <div class="forms_dashboard_refresh" t-on-click="refresh" title="Refresh Dashboard">
+            <button class="forms_dashboard_refresh" t-on-click="refresh" title="Refresh Dashboard">
                 <i class="fa fa-refresh"/>
-            </div>
+            </button>
         </div>
     </t>
 </templates>
