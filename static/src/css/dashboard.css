@@ -1,10 +1,10 @@
 /* Dashboard Layout */
 .forms_dashboard_main {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 150px);
     overflow-y: auto;
     padding: 1.5rem;
     background-color: #f8f9fa;
-    -webkit-overflow-scrolling: touch; /* iOS smooth scrolling */
+    position: relative;
 }
 
 /* Stats Cards Grid */
@@ -12,10 +12,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.25rem;
-    margin-bottom: 2rem;
-}
-
-.forms_dashboard_header {
     margin-bottom: 2rem;
 }
 
@@ -28,7 +24,6 @@
     border: 1px solid #E0E0E0;
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
 }
 
 .forms_dashboard_stat_card:hover {
@@ -77,17 +72,75 @@
     gap: 0.5rem;
 }
 
-/* Cross-browser form controls */
+/* Custom Date Range Group */
+.forms_dashboard_custom_date_group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.forms_dashboard_custom_date_group input[type="date"] {
+    max-width: 150px;
+}
+
+/* Form Controls */
 .forms_dashboard_filters select,
 .forms_dashboard_filters .form-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    min-width: 150px;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 16px 12px;
-    padding-right: 2.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.forms_dashboard_filters .form-select:focus,
+.forms_dashboard_filters input[type="date"]:focus {
+    border-color: #714B67;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(113, 75, 103, 0.25);
+}
+
+/* Button styling */
+.forms_dashboard_filters .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+    text-decoration: none;
+    border: 1px solid transparent;
+}
+
+.forms_dashboard_filters .btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.forms_dashboard_filters .btn-secondary:hover {
+    color: #fff;
+    background-color: #5a6268;
+    border-color: #545b62;
 }
 
 /* Status Badges */
@@ -99,6 +152,12 @@
     border-radius: 50rem;
     color: white;
     text-transform: capitalize;
+}
+
+.badge-light {
+    background-color: #f8f9fa;
+    color: #495057 !important;
+    border: 1px solid #dee2e6;
 }
 
 .badge-new { background-color: #714B67; }
@@ -127,14 +186,12 @@
     color: #4C4C4C;
     font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 1.5rem;
 }
 
 .forms_dashboard_recent .table-responsive {
-    max-height: calc(100vh - 450px);
+    max-height: 400px;
     overflow-y: auto;
     border-radius: 8px;
-    -webkit-overflow-scrolling: touch;
 }
 
 .forms_dashboard_recent table {
@@ -161,32 +218,79 @@
     color: #4C4C4C;
 }
 
-.forms_dashboard_recent tr:hover {
-    background-color: #f8f9fa;
+/* Clickable Row Styles */
+.forms_dashboard_clickable_row {
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-/* Refresh Button */
+.forms_dashboard_clickable_row:hover {
+    background-color: #f0f8ff;
+    transform: translateX(2px);
+}
+
+.forms_dashboard_clickable_row:hover .fa-arrow-right {
+    transform: translateX(3px);
+}
+
+.forms_dashboard_clickable_row .fa-arrow-right {
+    transition: transform 0.2s ease;
+    opacity: 0.7;
+}
+
+.forms_dashboard_clickable_row:hover .fa-arrow-right {
+    opacity: 1;
+}
+
+.forms_dashboard_clickable_row:hover .text-primary {
+    text-decoration: underline;
+}
+
+/* Activity Table Specific Styles */
+.forms_dashboard_activity_table tbody tr {
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.forms_dashboard_activity_table tbody tr:hover {
+    border-left-color: #714B67;
+    box-shadow: inset 0 0 0 1px rgba(113, 75, 103, 0.1);
+}
+
+/* Fixed Floating Refresh Button */
 .forms_dashboard_refresh {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
     background: #714B67;
     color: white;
-    /* width: 3rem; */
-    /* height: 3rem; */
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    transition: transform 0.2s;
+    box-shadow: 0 4px 12px rgba(113, 75, 103, 0.3);
+    transition: all 0.3s ease;
     z-index: 100;
-    -webkit-tap-highlight-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: 18px;
 }
 
 .forms_dashboard_refresh:hover {
-    transform: rotate(180deg);
+    background: #5a3c52;
+    transform: translateY(-2px) rotate(180deg);
+    box-shadow: 0 6px 16px rgba(113, 75, 103, 0.4);
+}
+
+.forms_dashboard_refresh:active {
+    transform: translateY(0) rotate(180deg);
+}
+
+.forms_dashboard_refresh i {
+    transition: none;
 }
 
 /* Loading Spinner */
@@ -198,7 +302,6 @@
     border-top: 2px solid #714B67;
     border-radius: 50%;
     animation: spin 1s linear infinite;
-    -webkit-animation: spin 1s linear infinite;
     margin-left: 0.5rem;
 }
 
@@ -242,7 +345,7 @@
     flex-grow: 1;
 }
 
-/* Canvas specific styles for Chart.js */
+/* Canvas specific styles */
 .forms_dashboard_chart_container canvas {
     display: block !important;
     box-sizing: border-box !important;
@@ -250,13 +353,13 @@
     width: 100% !important;
 }
 
-/* Remove Chart.js default animations that might cause issues */
+/* Remove Chart.js animations that cause issues */
 .chartjs-render-monitor {
     animation: none !important;
     -webkit-animation: none !important;
 }
 
-/* Keyframes with vendor prefixes */
+/* Keyframes */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -267,74 +370,7 @@
     100% { -webkit-transform: rotate(360deg); }
 }
 
-/* Form select styling for cross-browser compatibility */
-.forms_dashboard_filters .form-select {
-    min-width: 150px;
-    height: calc(1.5em + 0.75rem + 2px);
-    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #212529;
-    background-color: #fff;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-}
-
-.forms_dashboard_filters .form-select:focus {
-    border-color: #714B67;
-    outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(113, 75, 103, 0.25);
-}
-
-/* Button styling */
-.forms_dashboard_filters .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    border-radius: 0.25rem;
-    transition: all 0.15s ease-in-out;
-    text-decoration: none;
-    border: 1px solid transparent;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
-
-.forms_dashboard_filters .btn-secondary {
-    color: #fff;
-    background-color: #6c757d;
-    border-color: #6c757d;
-}
-
-.forms_dashboard_filters .btn-secondary:hover {
-    color: #fff;
-    background-color: #5a6268;
-    border-color: #545b62;
-}
-
-/* Odoo specific adjustments */
-.o_action_manager .forms_dashboard_main {
-    height: 100%;
-    max-height: calc(100vh - 150px);
-}
-
-/* Ensure charts don't overflow their containers */
-.forms_dashboard_chart_card {
-    overflow: hidden;
-}
-
-/* Additional spacing for better visual hierarchy */
-.forms_dashboard_main > *:not(:last-child) {
-    margin-bottom: 1.5rem;
-}
-
-/* Cross-browser scrollbar styling */
+/* Scrollbar styling */
 .forms_dashboard_recent .table-responsive::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -360,6 +396,12 @@
     scrollbar-color: #888 #f1f1f1;
 }
 
+/* Odoo specific adjustments */
+.o_action_manager .forms_dashboard_main {
+    height: 100%;
+    max-height: calc(100vh - 120px);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .forms_dashboard_main {
@@ -383,13 +425,18 @@
         align-items: stretch;
     }
     
-    .forms_dashboard_filter_group {
+    .forms_dashboard_filter_group,
+    .forms_dashboard_custom_date_group {
         width: 100%;
+        flex-direction: column;
+        align-items: stretch;
     }
     
     .forms_dashboard_filter_group select,
-    .forms_dashboard_filter_group .form-select {
+    .forms_dashboard_filter_group .form-select,
+    .forms_dashboard_custom_date_group input[type="date"] {
         width: 100%;
+        max-width: none;
     }
     
     .forms_dashboard_charts {
@@ -407,14 +454,45 @@
     .forms_dashboard_refresh {
         bottom: 1rem;
         right: 1rem;
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+    
+    /* Hide arrow icon on mobile for space */
+    .forms_dashboard_clickable_row .fa-arrow-right {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .forms_dashboard_main {
+        padding: 0.75rem;
+    }
+    
+    .forms_dashboard_filters {
+        padding: 0.75rem;
+    }
+    
+    .forms_dashboard_stat_number {
+        font-size: 1.5rem;
+    }
+    
+    .forms_dashboard_recent {
+        padding: 1rem;
+    }
+    
+    .forms_dashboard_recent td,
+    .forms_dashboard_recent th {
+        padding: 0.5rem;
+        font-size: 0.875rem;
     }
 }
 
 /* Print styles */
 @media print {
     .forms_dashboard_filters,
-    .forms_dashboard_refresh,
-    .oe_chatter {
+    .forms_dashboard_refresh {
         display: none !important;
     }
     
@@ -425,5 +503,14 @@
     
     .forms_dashboard_charts {
         page-break-inside: avoid;
+    }
+    
+    .forms_dashboard_recent .table-responsive {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .forms_dashboard_clickable_row {
+        cursor: default;
     }
 }

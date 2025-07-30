@@ -34,7 +34,10 @@ export class FormsDashboard extends Component {
             lastUpdate: this.formatDate(new Date()),
             dateRange: 7,
             statusFilter: 'all',
-            trendPeriod: 'daily'
+            trendPeriod: 'daily',
+            customDateFrom: '',
+            customDateTo: '',
+            showCustomDate: false
         });
         
         onWillStart(async () => {
@@ -115,6 +118,14 @@ export class FormsDashboard extends Component {
         });
     }
 
+    formatDateForInput(date) {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     async initializeCharts() {
         try {
             // Check if refs are available
@@ -171,8 +182,8 @@ export class FormsDashboard extends Component {
                             },
                             {
                                 label: 'Collaborations',
-                                borderColor: '#28a745',
-                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                borderColor: '#a77f28ff',
+                                backgroundColor: 'rgba(167, 123, 40, 0.1)',
                                 data: trendData.datasets[2].data || [],
                                 tension: 0.4,
                                 fill: true
@@ -427,9 +438,16 @@ export class FormsDashboard extends Component {
 
     async loadCounts() {
         const dateRange = this.state.dateRange;
-        const domain = dateRange === 'all' ? [] : [
-            ['create_date', '>=', this.getDateRangeDomain(dateRange)]
-        ];
+        let domain = [];
+        
+        if (this.state.showCustomDate && this.state.customDateFrom && this.state.customDateTo) {
+            domain = [
+                ['create_date', '>=', this.state.customDateFrom + ' 00:00:00'],
+                ['create_date', '<=', this.state.customDateTo + ' 23:59:59']
+            ];
+        } else if (dateRange !== 'all') {
+            domain = [['create_date', '>=', this.getDateRangeDomain(dateRange)]];
+        }
 
         const [partnerships, donations, collaborations] = await Promise.all([
             this.orm.searchCount("partnership.inquiry", domain),
@@ -463,7 +481,10 @@ export class FormsDashboard extends Component {
             const dateRange = this.state.dateRange;
             let domain = [];
             
-            if (dateRange !== 'all') {
+            if (this.state.showCustomDate && this.state.customDateFrom && this.state.customDateTo) {
+                domain.push(['create_date', '>=', this.state.customDateFrom + ' 00:00:00']);
+                domain.push(['create_date', '<=', this.state.customDateTo + ' 23:59:59']);
+            } else if (dateRange !== 'all') {
                 domain.push(['create_date', '>=', this.getDateRangeDomain(dateRange)]);
             }
 
@@ -496,25 +517,31 @@ export class FormsDashboard extends Component {
 
             const allActivities = [
                 ...partnerships.map(p => ({
-                    id: `partnership_${p.id}`,
+                    id: p.id,
+                    recordId: p.id,
                     name: p.name || '',
                     type: 'Partnership',
+                    model: 'partnership.inquiry',
                     state: p.state || 'new',
                     date: this.formatDate(new Date(p.create_date)),
                     create_date: p.create_date,
                 })),
                 ...donations.map(d => ({
                     id: `donation_${d.id}`,
+                    recordId: d.id,
                     name: d.name || '',
                     type: 'Donation',
+                    model: 'donation.inquiry',
                     state: d.state || 'new',
                     date: this.formatDate(new Date(d.create_date)),
                     create_date: d.create_date,
                 })),
                 ...collaborations.map(c => ({
                     id: `collaboration_${c.id}`,
+                    recordId: c.id,
                     name: c.name || '',
                     type: 'Collaboration',
+                    model: 'collaboration.inquiry',
                     state: c.state || 'new',
                     date: this.formatDate(new Date(c.create_date)),
                     create_date: c.create_date,
@@ -536,8 +563,27 @@ export class FormsDashboard extends Component {
     }
 
     async onDateRangeChange(ev) {
-        this.state.dateRange = parseInt(ev.target.value) || 'all';
-        await this.loadData();
+        const value = ev.target.value;
+        if (value === 'custom') {
+            this.state.showCustomDate = true;
+            // Set default dates to last 30 days
+            const today = new Date();
+            const thirtyDaysAgo = new Date(today);
+            thirtyDaysAgo.setDate(today.getDate() - 30);
+            
+            this.state.customDateTo = this.formatDateForInput(today);
+            this.state.customDateFrom = this.formatDateForInput(thirtyDaysAgo);
+        } else {
+            this.state.showCustomDate = false;
+            this.state.dateRange = parseInt(value) || 'all';
+            await this.loadData();
+        }
+    }
+
+    async onCustomDateChange() {
+        if (this.state.customDateFrom && this.state.customDateTo) {
+            await this.loadData();
+        }
     }
 
     async onStatusChange(ev) {
@@ -578,6 +624,22 @@ export class FormsDashboard extends Component {
             headers.join(','),
             ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
         ].join('\n');
+    }
+
+    // Open specific inquiry record - FIXED METHOD
+    openInquiryRecord(activity) {
+        try {
+            this.action.doAction({
+                type: 'ir.actions.act_window',
+                res_model: activity.model,
+                res_id: activity.recordId,
+                views: [[false, 'form']],
+                view_mode: 'form',
+                target: 'current',
+            });
+        } catch (error) {
+            console.error("Error opening inquiry record:", error);
+        }
     }
     
     openPartnerships() {

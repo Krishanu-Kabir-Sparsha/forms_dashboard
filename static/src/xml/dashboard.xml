@@ -11,8 +11,28 @@
                         <option value="30">Last 30 Days</option>
                         <option value="90">Last 90 Days</option>
                         <option value="all">All Time</option>
+                        <option value="custom">Custom Date Range</option>
                     </select>
                 </div>
+                
+                <!-- Custom Date Range Picker -->
+                <t t-if="state.showCustomDate">
+                    <div class="forms_dashboard_custom_date_group">
+                        <label for="dateFrom" class="me-2">From:</label>
+                        <input type="date" 
+                               id="dateFrom" 
+                               class="form-control form-control-sm" 
+                               t-att-value="state.customDateFrom"
+                               t-on-change="(ev) => { state.customDateFrom = ev.target.value; onCustomDateChange(); }"/>
+                        <label for="dateTo" class="mx-2">To:</label>
+                        <input type="date" 
+                               id="dateTo" 
+                               class="form-control form-control-sm" 
+                               t-att-value="state.customDateTo"
+                               t-on-change="(ev) => { state.customDateTo = ev.target.value; onCustomDateChange(); }"/>
+                    </div>
+                </t>
+                
                 <div class="forms_dashboard_filter_group">
                     <label for="statusFilter" class="me-2">Status:</label>
                     <select class="form-select" id="statusFilter" t-on-change="onStatusChange">
@@ -115,32 +135,50 @@
 
             <!-- Recent Activity Section -->
             <div class="forms_dashboard_recent">
-                <h3>Recent Activity</h3>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="mb-0">Recent Activity</h3>
+                    <small class="text-muted">Click on any row to view details</small>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover forms_dashboard_activity_table">
                         <thead>
                             <tr>
                                 <th>Reference</th>
                                 <th>Type</th>
                                 <th>Status</th>
                                 <th>Submission Date</th>
+                                <th class="text-center" style="width: 50px;">
+                                    <i class="fa fa-external-link" title="View"/>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-foreach="state.recentActivity" t-as="activity" t-key="activity.id">
-                                <tr>
-                                    <td><t t-esc="activity.name"/></td>
-                                    <td><t t-esc="activity.type"/></td>
+                                <tr class="forms_dashboard_clickable_row" 
+                                    t-on-click="openInquiryRecord.bind(this, activity)"
+                                    t-att-data-record-id="activity.recordId"
+                                    t-att-data-model="activity.model">
+                                    <td>
+                                        <span class="fw-bold text-primary"><t t-esc="activity.name"/></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-light text-dark">
+                                            <t t-esc="activity.type"/>
+                                        </span>
+                                    </td>
                                     <td>
                                         <span t-attf-class="badge badge-#{activity.state}">
                                             <t t-esc="activity.state.replace('_', ' ').charAt(0).toUpperCase() + activity.state.replace('_', ' ').slice(1)"/>
                                         </span>
                                     </td>
                                     <td><t t-esc="activity.date"/></td>
+                                    <td class="text-center">
+                                        <i class="fa fa-arrow-right text-primary"/>
+                                    </td>
                                 </tr>
                             </t>
                             <tr t-if="!state.recentActivity || state.recentActivity.length === 0">
-                                <td colspan="4" class="text-center text-muted py-3">
+                                <td colspan="5" class="text-center text-muted py-3">
                                     No activities found
                                 </td>
                             </tr>
