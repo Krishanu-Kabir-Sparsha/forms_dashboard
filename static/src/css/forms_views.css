@@ -1,0 +1,409 @@
+/* Forms Dashboard View Enhancements for Odoo 18 */
+
+/* Form View General Styling */
+.o_form_view.o_partnership_inquiry_form,
+.o_form_view.o_donation_inquiry_form,
+.o_form_view.o_collaboration_inquiry_form {
+    background-color: #f8f9fa;
+}
+
+.o_form_view .o_form_sheet {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Enhanced Title Section */
+.o_form_view .oe_title {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem;
+    margin: -16px -16px 24px -16px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 3px solid #714B67;
+}
+
+.o_form_view .oe_title h1 {
+    color: #714B67;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.o_form_view .oe_title h2 {
+    color: #333;
+    font-size: 1.4rem;
+    font-weight: 400;
+}
+
+/* Button Box Styling */
+.o_form_view .oe_button_box {
+    margin-bottom: 1.5rem;
+}
+
+.o_form_view .oe_button_box .oe_stat_button {
+    background: #ffffff;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    min-height: 70px;
+}
+
+.o_form_view .oe_button_box .oe_stat_button:hover {
+    border-color: #714B67;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(113, 75, 103, 0.15);
+}
+
+.o_form_view .oe_button_box .o_stat_value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #714B67;
+}
+
+/* Group Headers */
+.o_form_view .o_group .o_group_header {
+    font-weight: 600;
+    color: #495057;
+    font-size: 1.1rem;
+    border-bottom: 2px solid #714B67;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Field Styling */
+.o_form_view .o_field_widget input,
+.o_form_view .o_field_widget textarea,
+.o_form_view .o_field_widget select {
+    border: 1.5px solid #dee2e6;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.o_form_view .o_field_widget input:focus,
+.o_form_view .o_field_widget textarea:focus,
+.o_form_view .o_field_widget select:focus {
+    border-color: #714B67;
+    box-shadow: 0 0 0 0.2rem rgba(113, 75, 103, 0.15);
+}
+
+/* Selection Badge Widget */
+.o_field_widget.o_field_selection_badge {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.o_field_widget.o_field_selection_badge .o_selection_badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    border: 2px solid #dee2e6;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.o_field_widget.o_field_selection_badge .o_selection_badge:hover {
+    border-color: #714B67;
+    background: #f3f0f2;
+}
+
+.o_field_widget.o_field_selection_badge .o_selection_badge.active {
+    background: #714B67;
+    color: white;
+    border-color: #714B67;
+}
+
+/* Radio Widget Horizontal */
+.o_field_widget.o_field_radio.o_horizontal {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.o_field_widget.o_field_radio.o_horizontal .o_radio_item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Notebook Tabs */
+.o_form_view .o_notebook {
+    margin-top: 2rem;
+}
+
+.o_form_view .o_notebook .nav-tabs {
+    border-bottom: 2px solid #dee2e6;
+}
+
+.o_form_view .o_notebook .nav-link {
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.o_form_view .o_notebook .nav-link:hover {
+    color: #714B67;
+    border-bottom-color: #d4c3cf;
+}
+
+.o_form_view .o_notebook .nav-link.active {
+    color: #714B67;
+    border-bottom-color: #714B67;
+    background: none;
+}
+
+/* Status Bar Enhancement */
+.o_form_view .o_statusbar {
+    background: #f8f9fa;
+    border-radius: 30px;
+    padding: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.o_form_view .o_statusbar .o_statusbar_status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.o_form_view .o_statusbar_status button {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.o_form_view .o_statusbar_status button.o_arrow_button:after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 20px 0 20px 20px;
+    border-color: transparent transparent transparent #f8f9fa;
+}
+
+.o_form_view .o_statusbar_status button.o_arrow_button.o_current {
+    background: #714B67;
+    color: white;
+}
+
+.o_form_view .o_statusbar_status button.o_arrow_button.o_current:after {
+    border-left-color: #714B67;
+}
+
+/* Ribbon Widget */
+.o_form_view .o_ribbon {
+    top: 0;
+    right: 0;
+    position: absolute;
+}
+
+/* List View in Form (State History) */
+.o_form_view .o_field_one2many .o_list_view {
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.o_form_view .o_field_one2many .o_list_view thead {
+    background: #f8f9fa;
+}
+
+.o_form_view .o_field_one2many .o_list_view th {
+    font-weight: 600;
+    color: #495057;
+    padding: 0.75rem;
+}
+
+/* Badge Styling */
+.badge {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    font-weight: 500;
+    border-radius: 15px;
+    text-transform: capitalize;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+}
+
+/* Kanban View Enhancements */
+.o_kanban_view.o_kanban_mobile .o_kanban_record {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.o_kanban_view.o_kanban_mobile .o_kanban_record:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.o_kanban_view .o_kanban_record_title {
+    font-weight: 600;
+    color: #714B67;
+    font-size: 1rem;
+}
+
+/* List View Enhancements */
+.o_list_view {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.o_list_view thead {
+    background: #f8f9fa;
+}
+
+.o_list_view th {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.o_list_view tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.o_list_view tbody tr.o_data_row {
+    transition: all 0.2s ease;
+}
+
+/* Search Panel Styling */
+.o_search_panel {
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+}
+
+.o_search_panel .o_search_panel_category_value header {
+    font-weight: 600;
+    color: #495057;
+    padding: 0.75rem;
+    background: #e9ecef;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.o_search_panel .o_search_panel_category_value .o_search_panel_category_value {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.o_search_panel .o_search_panel_category_value .o_search_panel_category_value:hover {
+    background: #e9ecef;
+}
+
+.o_search_panel .o_search_panel_category_value .o_search_panel_category_value.active {
+    background: #714B67;
+    color: white;
+}
+
+/* Chatter Enhancement */
+.o_form_view .oe_chatter {
+    border-top: 2px solid #dee2e6;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .o_form_view .oe_title {
+        padding: 1.5rem 1rem;
+    }
+    
+    .o_form_view .oe_title h1 {
+        font-size: 1.5rem;
+    }
+    
+    .o_form_view .oe_title h2 {
+        font-size: 1.2rem;
+    }
+    
+    .o_form_view .o_group {
+        display: block !important;
+    }
+    
+    .o_form_view .o_group .o_group {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    
+    .o_field_widget.o_field_radio.o_horizontal {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .o_form_view .o_statusbar_status button {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .o_form_view .oe_chatter,
+    .o_form_view .o_statusbar,
+    .o_form_view header,
+    .o_form_view .oe_button_box {
+        display: none !important;
+    }
+    
+    .o_form_view .o_form_sheet {
+        box-shadow: none;
+        border: 1px solid #dee2e6;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .o_form_view .o_form_sheet {
+        background: #1a1a1a;
+        color: #e0e0e0;
+    }
+    
+    .o_form_view .oe_title {
+        background: linear-gradient(135deg, #2a2a2a 0%, #3a3a3a 100%);
+    }
+    
+    .o_form_view .o_field_widget input,
+    .o_form_view .o_field_widget textarea,
+    .o_form_view .o_field_widget select {
+        background: #2a2a2a;
+        border-color: #3a3a3a;
+        color: #e0e0e0;
+    }
+    
+    .o_list_view,
+    .o_kanban_view {
+        background: #1a1a1a;
+    }
+}

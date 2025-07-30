@@ -33,6 +33,7 @@
             'https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js',
             'forms_dashboard/static/src/js/dashboard.js',
             'forms_dashboard/static/src/css/dashboard.css',
+            'forms_dashboard/static/src/css/forms_views.css',
             'forms_dashboard/static/src/xml/dashboard.xml', 
         ],
     },

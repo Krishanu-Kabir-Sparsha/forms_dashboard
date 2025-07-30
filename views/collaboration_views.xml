@@ -1,10 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Collaboration Inquiry List View -->
     <record id="view_collaboration_inquiry_list" model="ir.ui.view">
         <field name="name">collaboration.inquiry.list</field>
         <field name="model">collaboration.inquiry</field>
         <field name="arch" type="xml">
-            <list string="Collaboration Inquiries" decoration-info="state=='new'" decoration-success="state=='active'">
+            <list string="Collaboration Inquiries" 
+                  decoration-info="state=='new'" 
+                  decoration-success="state in ['approved','active']"
+                  decoration-warning="state=='in_progress'"
+                  decoration-danger="state in ['cancelled','declined']"
+                  decoration-muted="state=='done'">
+                <field name="name" string="Reference" class="fw-bold"/>
+                <field name="institution_name" string="Institution"/>
+                <field name="contact_name"/>
+                <field name="email" widget="email"/>
+                <field name="collaboration_type"/>
+                <field name="institution_type" optional="show"/>
+                <field name="country" optional="show"/>
+                <field name="state" widget="badge" decoration-info="state=='new'" decoration-success="state in ['approved','active']" decoration-warning="state=='in_progress'" decoration-danger="state in ['cancelled','declined']"/>
+                <field name="date_submitted" widget="date"/>
+                <field name="create_uid" string="Created By" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Collaboration Inquiry Kanban View -->
+    <record id="view_collaboration_inquiry_kanban" model="ir.ui.view">
+        <field name="name">collaboration.inquiry.kanban</field>
+        <field name="model">collaboration.inquiry</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile" quick_create="false">
                 <field name="name"/>
                 <field name="institution_name"/>
                 <field name="contact_name"/>
@@ -13,95 +39,276 @@
                 <field name="institution_type"/>
                 <field name="country"/>
                 <field name="state"/>
-                <field name="date_submitted"/>
-            </list>
+                <field name="color"/>
+                <progressbar field="state" colors='{"new": "info", "in_progress": "warning", "approved": "success", "active": "success", "cancelled": "danger", "declined": "danger"}'/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''} oe_kanban_global_click">
+                            <div class="oe_kanban_details">
+                                <div class="o_kanban_record_top">
+                                    <div class="o_kanban_record_headings">
+                                        <strong class="o_kanban_record_title">
+                                            <field name="name"/>
+                                        </strong>
+                                    </div>
+                                    <div class="o_dropdown_kanban dropdown">
+                                        <a role="button" class="dropdown-toggle o-no-caret btn" data-bs-toggle="dropdown" data-bs-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                            <span class="fa fa-ellipsis-v"/>
+                                        </a>
+                                        <div class="dropdown-menu" role="menu">
+                                            <a role="menuitem" type="edit" class="dropdown-item">Edit</a>
+                                            <a role="menuitem" type="delete" class="dropdown-item">Delete</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <div class="text-muted">
+                                        <i class="fa fa-university me-1"/>
+                                        <field name="institution_name"/>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-user me-1"/>
+                                        <field name="contact_name"/>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-envelope me-1"/>
+                                        <field name="email" widget="email"/>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-globe me-1"/>
+                                        <field name="country"/>
+                                    </div>
+                                </div>
+                                <div class="o_kanban_record_bottom">
+                                    <div class="oe_kanban_bottom_left">
+                                        <field name="collaboration_type" widget="badge"/>
+                                    </div>
+                                    <div class="oe_kanban_bottom_right">
+                                        <field name="activity_ids" widget="kanban_activity"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
         </field>
     </record>
 
+    <!-- Collaboration Inquiry Form View -->
     <record id="view_collaboration_inquiry_form" model="ir.ui.view">
         <field name="name">collaboration.inquiry.form</field>
         <field name="model">collaboration.inquiry</field>
         <field name="arch" type="xml">
             <form string="Collaboration Inquiry">
                 <header>
-                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,approved,active"/>
+                    <button name="action_set_in_progress" type="object" string="Start Review" class="oe_highlight" invisible="state != 'new'"/>
+                    <button name="action_approve" type="object" string="Approve" class="oe_highlight" invisible="state != 'in_progress'"/>
+                    <button name="action_activate" type="object" string="Activate Collaboration" class="oe_highlight" invisible="state != 'approved'"/>
+                    <button name="action_done" type="object" string="Complete" invisible="state != 'active'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state in ['done','cancelled','declined']"/>
+                    <button name="action_decline" type="object" string="Decline" invisible="state in ['done','cancelled','declined']" class="btn-secondary"/>
+                    <button name="action_reset_draft" type="object" string="Reset to New" invisible="state not in ['cancelled','declined']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,approved,active,done" statusbar_colors='{"new":"blue","in_progress":"yellow","approved":"green","active":"green","done":"gray","cancelled":"red","declined":"red"}'/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>
-                            <field name="name" readonly="1"/>
-                        </h1>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_activities" type="object" class="oe_stat_button" icon="fa-clock-o">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="activity_count"/>
+                                </span>
+                                <span class="o_stat_text">Activities</span>
+                            </div>
+                        </button>
                     </div>
+                    <widget name="web_ribbon" title="New" bg_color="info" invisible="state != 'new'"/>
+                    <widget name="web_ribbon" title="In Progress" bg_color="warning" invisible="state != 'in_progress'"/>
+                    <widget name="web_ribbon" title="Approved" bg_color="success" invisible="state != 'approved'"/>
+                    <widget name="web_ribbon" title="Active" bg_color="success" invisible="state != 'active'"/>
+                    <widget name="web_ribbon" title="Done" invisible="state != 'done'"/>
+                    <widget name="web_ribbon" title="Cancelled" bg_color="danger" invisible="state != 'cancelled'"/>
+                    <widget name="web_ribbon" title="Declined" bg_color="danger" invisible="state != 'declined'"/>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" readonly="1" class="text-primary"/>
+                        </h1>
+                        <label for="institution_name" class="oe_edit_only"/>
+                        <h2>
+                            <field name="institution_name" placeholder="Enter institution name..." class="o_text_overflow"/>
+                        </h2>
+                    </div>
+                    
                     <group>
-                        <group>
-                            <field name="institution_name"/>
-                            <field name="contact_name"/>
-                            <field name="email"/>
-                            <field name="phone"/>
+                        <group name="contact_info" string="Contact Information">
+                            <field name="contact_name" placeholder="Full name of contact person"/>
+                            <field name="email" widget="email" placeholder="email@example.com"/>
+                            <field name="phone" widget="phone" placeholder="+1 234 567 8900"/>
+                            <field name="country" placeholder="Country or region"/>
                         </group>
-                        <group>
-                            <field name="collaboration_type"/>
-                            <field name="institution_type"/>
-                            <field name="country"/>
-                            <field name="source"/>
-                            <field name="date_submitted"/>
+                        <group name="collaboration_details" string="Collaboration Details">
+                            <field name="collaboration_type" widget="selection_badge"/>
+                            <field name="institution_type" widget="radio" options="{'horizontal': true}"/>
                         </group>
                     </group>
+                    
+                    <group name="metadata" string="Submission Information">
+                        <group>
+                            <field name="source" readonly="1" widget="badge"/>
+                            <field name="date_submitted" readonly="1" widget="datetime"/>
+                        </group>
+                        <group>
+                            <field name="create_uid" string="Created By" readonly="1"/>
+                            <field name="write_date" string="Last Updated" readonly="1" widget="datetime"/>
+                        </group>
+                    </group>
+                    
                     <notebook>
-                        <page string="Collaboration Scope">
-                            <field name="scope"/>
+                        <page string="Collaboration Scope" name="scope">
+                            <group>
+                                <field name="scope" nolabel="1" placeholder="Describe the scope and objectives of the collaboration..." 
+                                       style="min-height: 200px;" class="o_field_text"/>
+                            </group>
+                        </page>
+                        <page string="Agreement Details" name="agreement" groups="forms_dashboard.group_forms_dashboard_manager">
+                            <group>
+                                <group string="Agreement Information">
+                                    <field name="agreement_signed"/>
+                                    <field name="agreement_date" widget="date" invisible="not agreement_signed"/>
+                                    <field name="agreement_reference" invisible="not agreement_signed"/>
+                                </group>
+                                <group string="Collaboration Period">
+                                    <field name="start_date" widget="date"/>
+                                    <field name="end_date" widget="date"/>
+                                    <field name="is_active" readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Key Contacts">
+                                <field name="key_contacts" nolabel="1">
+                                    <list editable="bottom">
+                                        <field name="name"/>
+                                        <field name="role"/>
+                                        <field name="email" widget="email"/>
+                                        <field name="phone" widget="phone"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Internal Notes" name="notes" groups="forms_dashboard.group_forms_dashboard_manager">
+                            <group>
+                                <field name="internal_notes" nolabel="1" placeholder="Add internal notes about this collaboration..." 
+                                       style="min-height: 150px;"/>
+                            </group>
+                        </page>
+                        <page string="History" name="history">
+                            <group>
+                                <field name="state_history" readonly="1" nolabel="1">
+                                    <list>
+                                        <field name="date" widget="datetime"/>
+                                        <field name="user_id"/>
+                                        <field name="old_state"/>
+                                        <field name="new_state"/>
+                                        <field name="note"/>
+                                    </list>
+                                </field>
+                            </group>
                         </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
-                    <field name="message_ids"/>
+                    <field name="message_ids" options="{'post_refresh': 'always'}"/>
                 </div>
             </form>
         </field>
     </record>
 
+    <!-- Search View -->
     <record id="view_collaboration_inquiry_search" model="ir.ui.view">
         <field name="name">collaboration.inquiry.search</field>
         <field name="model">collaboration.inquiry</field>
         <field name="arch" type="xml">
-            <search string="Collaboration Inquiries">
-                <field name="name"/>
-                <field name="institution_name"/>
-                <field name="contact_name"/>
+            <search string="Search Collaboration Inquiries">
+                <field name="name" string="Reference"/>
+                <field name="institution_name" string="Institution" filter_domain="[('institution_name', 'ilike', self)]"/>
+                <field name="contact_name" string="Contact" filter_domain="[('contact_name', 'ilike', self)]"/>
                 <field name="email"/>
                 <field name="country"/>
-                <filter string="New" name="new" domain="[('state', '=', 'new')]"/>
-                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]"/>
-                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]"/>
-                <filter string="Active" name="active" domain="[('state', '=', 'active')]"/>
+                <field name="collaboration_type"/>
+                <field name="institution_type"/>
                 <separator/>
-                <filter string="This Week" name="this_week" 
-                        domain="[('date_submitted', '&gt;=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
-                <filter string="This Month" name="this_month" 
-                        domain="[('date_submitted', '&gt;=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter string="New" name="new" domain="[('state', '=', 'new')]" help="New inquiries"/>
+                <filter string="In Progress" name="in_progress" domain="[('state', '=', 'in_progress')]" help="Inquiries being reviewed"/>
+                <filter string="Approved" name="approved" domain="[('state', '=', 'approved')]" help="Approved collaborations"/>
+                <filter string="Active" name="active_collab" domain="[('state', '=', 'active')]" help="Active collaborations"/>
+                <filter string="Active Inquiries" name="active" domain="[('state', 'not in', ['done', 'cancelled', 'declined'])]" help="All active inquiries"/>
+                <separator/>
+                <filter string="Today" name="today" domain="[('date_submitted', '&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0))]"/>
+                <filter string="This Week" name="this_week" domain="[('date_submitted', '&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="This Month" name="this_month" domain="[('date_submitted', '&gt;=', context_today().replace(day=1).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="My Activities" name="my_activities" domain="[('activity_ids.user_id', '=', uid)]"/>
+                <filter string="Late Activities" name="late_activities" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Today Activities" name="today_activities" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Upcoming Activities" name="upcoming_activities" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
                 <group expand="0" string="Group By">
                     <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
-                    <filter string="Collaboration Type" name="group_collaboration_type" context="{'group_by': 'collaboration_type'}"/>
-                    <filter string="Institution Type" name="group_institution_type" context="{'group_by': 'institution_type'}"/>
+                    <filter string="Collaboration Type" name="group_type" context="{'group_by': 'collaboration_type'}"/>
+                    <filter string="Institution Type" name="group_inst_type" context="{'group_by': 'institution_type'}"/>
                     <filter string="Country" name="group_country" context="{'group_by': 'country'}"/>
-                    <filter string="Submission Date" name="group_date_submitted" context="{'group_by': 'date_submitted'}"/>
+                    <filter string="Source" name="group_source" context="{'group_by': 'source'}"/>
+                    <separator/>
+                    <filter string="Submission Date" name="group_date" context="{'group_by': 'date_submitted:month'}"/>
+                    <filter string="Created By" name="group_create_uid" context="{'group_by': 'create_uid'}"/>
                 </group>
+                <searchpanel>
+                    <field name="state" string="Status" enable_counters="1" icon="fa-tasks"/>
+                    <field name="collaboration_type" string="Type" enable_counters="1" icon="fa-users"/>
+                    <field name="institution_type" string="Institution" enable_counters="1" icon="fa-university"/>
+                </searchpanel>
             </search>
         </field>
     </record>
 
+    <!-- Graph View -->
+    <record id="view_collaboration_inquiry_graph" model="ir.ui.view">
+        <field name="name">collaboration.inquiry.graph</field>
+        <field name="model">collaboration.inquiry</field>
+        <field name="arch" type="xml">
+            <graph string="Collaboration Analysis" type="bar" stacked="1">
+                <field name="collaboration_type" type="row"/>
+                <field name="state" type="col"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_collaboration_inquiry_pivot" model="ir.ui.view">
+        <field name="name">collaboration.inquiry.pivot</field>
+        <field name="model">collaboration.inquiry</field>
+        <field name="arch" type="xml">
+            <pivot string="Collaboration Analysis">
+                <field name="collaboration_type" type="row"/>
+                <field name="state" type="col"/>
+                <field name="institution_type" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Action -->
     <record id="action_collaboration_inquiry" model="ir.actions.act_window">
         <field name="name">Collaboration Inquiries</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">collaboration.inquiry</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,kanban,form,graph,pivot</field>
         <field name="search_view_id" ref="view_collaboration_inquiry_search"/>
-        <field name="context">{}</field>
+        <field name="context">{'search_default_active': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Create your first collaboration inquiry!
+                No collaboration inquiries yet!
             </p>
             <p>
                 Collaboration inquiries from your website will automatically appear here.
