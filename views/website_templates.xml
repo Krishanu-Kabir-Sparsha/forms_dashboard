@@ -219,7 +219,7 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header border-0">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <button type="button" class="close" data-dismiss="modal">×</button>
                             </div>
                             <div class="modal-body p-0">
                                 <!-- Forms will be loaded here dynamically -->
