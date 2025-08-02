@@ -15,7 +15,7 @@
                     </select>
                 </div>
                 
-                <!-- Custom Date Range Picker -->
+                <!-- Custom Date Range Picker - FIXED -->
                 <t t-if="state.showCustomDate">
                     <div class="forms_dashboard_custom_date_group">
                         <label for="dateFrom" class="me-2">From:</label>
@@ -23,13 +23,13 @@
                                id="dateFrom" 
                                class="form-control form-control-sm" 
                                t-att-value="state.customDateFrom"
-                               t-on-change="(ev) => { state.customDateFrom = ev.target.value; onCustomDateChange(); }"/>
+                               t-on-change="onCustomDateFromChange"/>
                         <label for="dateTo" class="mx-2">To:</label>
                         <input type="date" 
                                id="dateTo" 
                                class="form-control form-control-sm" 
                                t-att-value="state.customDateTo"
-                               t-on-change="(ev) => { state.customDateTo = ev.target.value; onCustomDateChange(); }"/>
+                               t-on-change="onCustomDateToChange"/>
                     </div>
                 </t>
                 

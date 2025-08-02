@@ -580,11 +580,22 @@ export class FormsDashboard extends Component {
         }
     }
 
-    async onCustomDateChange() {
+    // FIXED: Separate event handlers for custom date inputs
+    async onCustomDateFromChange(ev) {
+        this.state.customDateFrom = ev.target.value;
         if (this.state.customDateFrom && this.state.customDateTo) {
             await this.loadData();
         }
     }
+
+    async onCustomDateToChange(ev) {
+        this.state.customDateTo = ev.target.value;
+        if (this.state.customDateFrom && this.state.customDateTo) {
+            await this.loadData();
+        }
+    }
+
+    // Remove the old onCustomDateChange method if it exists
 
     async onStatusChange(ev) {
         this.state.statusFilter = ev.target.value;
