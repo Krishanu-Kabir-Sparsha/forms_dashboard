@@ -91,7 +91,7 @@ class DonationInquiry(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Activities',
             'res_model': 'mail.activity',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('res_id', '=', self.id), ('res_model', '=', self._name)],
             'context': {
                 'default_res_id': self.id,

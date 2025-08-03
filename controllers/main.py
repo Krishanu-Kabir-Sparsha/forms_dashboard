@@ -6,7 +6,7 @@ _logger = logging.getLogger(__name__)
 
 class FormsDashboard(http.Controller):
     
-    @http.route('/website_form/den_partnership_inquiry', type='http', auth="public", methods=['POST'], website=True, csrf=False)
+    @http.route('/website_form/partnership.inquiry', type='http', auth="public", methods=['POST'], website=True, csrf=False)
     def create_partnership_inquiry(self, **kwargs):
         _logger.info("Partnership form submitted with data: %s", kwargs)
         
@@ -44,7 +44,7 @@ class FormsDashboard(http.Controller):
                 'form_type': 'Partnership'
             })
 
-    @http.route('/website_form/den_donation_inquiry', type='http', auth="public", methods=['POST'], website=True, csrf=False)
+    @http.route('/website_form/donation.inquiry', type='http', auth="public", methods=['POST'], website=True, csrf=False)
     def create_donation_inquiry(self, **kwargs):
         _logger.info("Donation form submitted with data: %s", kwargs)
         
@@ -54,7 +54,7 @@ class FormsDashboard(http.Controller):
                 'email': kwargs.get('email', ''),
                 'phone': kwargs.get('phone', ''),
                 'donation_type': kwargs.get('donation_type', ''),
-                'amount_range': kwargs.get('donation_amount', ''),
+                'amount_range': kwargs.get('amount_range', ''),
                 'recognition': kwargs.get('recognition', ''),
                 'interest_areas': kwargs.get('interest_areas', ''),
                 'source': 'website'
@@ -79,7 +79,7 @@ class FormsDashboard(http.Controller):
                 'form_type': 'Donation'
             })
 
-    @http.route('/website_form/den_collaboration_inquiry', type='http', auth="public", methods=['POST'], website=True, csrf=False)
+    @http.route('/website_form/collaboration.inquiry', type='http', auth="public", methods=['POST'], website=True, csrf=False)
     def create_collaboration_inquiry(self, **kwargs):
         _logger.info("Collaboration form submitted with data: %s", kwargs)
         
@@ -92,7 +92,7 @@ class FormsDashboard(http.Controller):
                 'collaboration_type': kwargs.get('collaboration_type', ''),
                 'institution_type': kwargs.get('institution_type', ''),
                 'country': kwargs.get('country', ''),
-                'scope': kwargs.get('collaboration_scope', ''),
+                'scope': kwargs.get('scope', ''),
                 'source': 'website'
             }
             

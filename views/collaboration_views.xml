@@ -42,7 +42,7 @@
                 <field name="color"/>
                 <progressbar field="state" colors='{"new": "info", "in_progress": "warning", "approved": "success", "active": "success", "cancelled": "danger", "declined": "danger"}'/>
                 <templates>
-                    <t t-name="kanban-box">
+                    <t t-name="card">
                         <div t-attf-class="#{!selection_mode ? kanban_color(record.color.raw_value) : ''} oe_kanban_global_click">
                             <div class="oe_kanban_details">
                                 <div class="o_kanban_record_top">
@@ -99,6 +99,7 @@
     <record id="view_collaboration_inquiry_form" model="ir.ui.view">
         <field name="name">collaboration.inquiry.form</field>
         <field name="model">collaboration.inquiry</field>
+        <field name="priority">1</field>
         <field name="arch" type="xml">
             <form string="Collaboration Inquiry">
                 <header>
@@ -109,7 +110,7 @@
                     <button name="action_cancel" type="object" string="Cancel" invisible="state in ['done','cancelled','declined']"/>
                     <button name="action_decline" type="object" string="Decline" invisible="state in ['done','cancelled','declined']" class="btn-secondary"/>
                     <button name="action_reset_draft" type="object" string="Reset to New" invisible="state not in ['cancelled','declined']"/>
-                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,approved,active,done" statusbar_colors='{"new":"blue","in_progress":"yellow","approved":"green","active":"green","done":"gray","cancelled":"red","declined":"red"}'/>
+                    <field name="state" widget="statusbar" statusbar_visible="new,in_progress,approved,active,done"/>
                 </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
@@ -216,17 +217,12 @@
                             </group>
                         </page>
                     </notebook>
-                </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids" options="{'post_refresh': 'always'}"/>
-                </div>
+                </sheet>               
             </form>
         </field>
     </record>
 
-    <!-- Search View -->
+    <!-- Search View WITHOUT searchpanel -->
     <record id="view_collaboration_inquiry_search" model="ir.ui.view">
         <field name="name">collaboration.inquiry.search</field>
         <field name="model">collaboration.inquiry</field>
@@ -264,11 +260,6 @@
                     <filter string="Submission Date" name="group_date" context="{'group_by': 'date_submitted:month'}"/>
                     <filter string="Created By" name="group_create_uid" context="{'group_by': 'create_uid'}"/>
                 </group>
-                <searchpanel>
-                    <field name="state" string="Status" enable_counters="1" icon="fa-tasks"/>
-                    <field name="collaboration_type" string="Type" enable_counters="1" icon="fa-users"/>
-                    <field name="institution_type" string="Institution" enable_counters="1" icon="fa-university"/>
-                </searchpanel>
             </search>
         </field>
     </record>
@@ -314,5 +305,41 @@
                 Collaboration inquiries from your website will automatically appear here.
             </p>
         </field>
+    </record>
+
+    <!-- Explicit View References -->
+    <record id="action_collaboration_inquiry_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_collaboration_inquiry_list"/>
+        <field name="act_window_id" ref="action_collaboration_inquiry"/>
+    </record>
+
+    <record id="action_collaboration_inquiry_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_collaboration_inquiry_kanban"/>
+        <field name="act_window_id" ref="action_collaboration_inquiry"/>
+    </record>
+
+    <record id="action_collaboration_inquiry_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_collaboration_inquiry_form"/>
+        <field name="act_window_id" ref="action_collaboration_inquiry"/>
+    </record>
+
+    <record id="action_collaboration_inquiry_graph" model="ir.actions.act_window.view">
+        <field name="sequence" eval="4"/>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_collaboration_inquiry_graph"/>
+        <field name="act_window_id" ref="action_collaboration_inquiry"/>
+    </record>
+
+    <record id="action_collaboration_inquiry_pivot" model="ir.actions.act_window.view">
+        <field name="sequence" eval="5"/>
+        <field name="view_mode">pivot</field>
+        <field name="view_id" ref="view_collaboration_inquiry_pivot"/>
+        <field name="act_window_id" ref="action_collaboration_inquiry"/>
     </record>
 </odoo>

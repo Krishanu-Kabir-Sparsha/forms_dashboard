@@ -24,8 +24,7 @@
         'views/donation_views.xml',
         'views/collaboration_views.xml',
         'views/dashboard_views.xml',
-        'views/form_response_templates.xml',
-        # 'views/website_templates.xml', 
+        'views/form_response_templates.xml', 
         'views/menu_views.xml',
     ],
     'assets': {
@@ -33,7 +32,6 @@
             'https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js',
             'forms_dashboard/static/src/js/dashboard.js',
             'forms_dashboard/static/src/css/dashboard.css',
-            'forms_dashboard/static/src/css/forms_views.css',
             'forms_dashboard/static/src/xml/dashboard.xml', 
         ],
     },

@@ -6,10 +6,12 @@
         <field name="tag">forms_dashboard_main</field>
     </record>
 
-    <!-- Partnership Inquiry Views -->
-    <record id="view_partnership_inquiry_list" model="ir.ui.view">
-        <field name="name">partnership.inquiry.list</field>
+    <!-- Dashboard List Views - Using different IDs to avoid conflicts -->
+    <record id="view_partnership_inquiry_dashboard_list" model="ir.ui.view">
+        <field name="name">partnership.inquiry.dashboard.list</field>
         <field name="model">partnership.inquiry</field>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <list string="Partnership Inquiries" create="false" edit="false" delete="false">
                 <field name="name"/>
@@ -24,10 +26,12 @@
         </field>
     </record>
 
-    <!-- Form View for Partnership -->
-    <record id="view_partnership_inquiry_form" model="ir.ui.view">
-        <field name="name">partnership.inquiry.form</field>
+    <!-- Dashboard Form View for Partnership - Using different ID -->
+    <record id="view_partnership_inquiry_dashboard_form" model="ir.ui.view">
+        <field name="name">partnership.inquiry.dashboard.form</field>
         <field name="model">partnership.inquiry</field>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <form string="Partnership Inquiry" create="false" edit="true" delete="false">
                 <header>
@@ -59,19 +63,17 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <!-- Chatter removed to avoid duplicates -->
             </form>
         </field>
     </record>
 
-    <!-- Donation Inquiry Views -->
-    <record id="view_donation_inquiry_list" model="ir.ui.view">
-        <field name="name">donation.inquiry.list</field>
+    <!-- Dashboard List View for Donation - Using different ID -->
+    <record id="view_donation_inquiry_dashboard_list" model="ir.ui.view">
+        <field name="name">donation.inquiry.dashboard.list</field>
         <field name="model">donation.inquiry</field>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <list string="Donation Inquiries" create="false" edit="false" delete="false">
                 <field name="name"/>
@@ -85,10 +87,12 @@
         </field>
     </record>
 
-    <!-- Form View for Donation -->
-    <record id="view_donation_inquiry_form" model="ir.ui.view">
-        <field name="name">donation.inquiry.form</field>
+    <!-- Dashboard Form View for Donation - Using different ID -->
+    <record id="view_donation_inquiry_dashboard_form" model="ir.ui.view">
+        <field name="name">donation.inquiry.dashboard.form</field>
         <field name="model">donation.inquiry</field>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <form string="Donation Inquiry" create="false" edit="true" delete="false">
                 <header>
@@ -119,19 +123,17 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <!-- Chatter removed to avoid duplicates -->
             </form>
         </field>
     </record>
 
-    <!-- Collaboration Inquiry Views -->
-    <record id="view_collaboration_inquiry_list" model="ir.ui.view">
-        <field name="name">collaboration.inquiry.list</field>
+    <!-- Dashboard List View for Collaboration - Using different ID -->
+    <record id="view_collaboration_inquiry_dashboard_list" model="ir.ui.view">
+        <field name="name">collaboration.inquiry.dashboard.list</field>
         <field name="model">collaboration.inquiry</field>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <list string="Collaboration Inquiries" create="false" edit="false" delete="false">
                 <field name="name"/>
@@ -146,10 +148,12 @@
         </field>
     </record>
 
-    <!-- Form View for Collaboration -->
-    <record id="view_collaboration_inquiry_form" model="ir.ui.view">
-        <field name="name">collaboration.inquiry.form</field>
+    <!-- Dashboard Form View for Collaboration - Using different ID -->
+    <record id="view_collaboration_inquiry_dashboard_form" model="ir.ui.view">
+        <field name="name">collaboration.inquiry.dashboard.form</field>
         <field name="model">collaboration.inquiry</field>
+        <field name="mode">primary</field>
+        <field name="priority">20</field>
         <field name="arch" type="xml">
             <form string="Collaboration Inquiry" create="false" edit="true" delete="false">
                 <header>
@@ -181,21 +185,16 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <!-- Chatter removed to avoid duplicates -->
             </form>
         </field>
     </record>
 
-    <!-- Actions for each inquiry type -->
-    <record id="action_partnership_inquiry" model="ir.actions.act_window">
+    <!-- Dashboard Actions for each inquiry type, using the dashboard-specific views -->
+    <record id="action_dashboard_partnership_inquiry" model="ir.actions.act_window">
         <field name="name">Partnership Inquiries</field>
         <field name="res_model">partnership.inquiry</field>
         <field name="view_mode">list,form</field>
-        <field name="view_id" ref="view_partnership_inquiry_list"/>
         <field name="context">{'create': False}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -207,11 +206,25 @@
         </field>
     </record>
 
-    <record id="action_donation_inquiry" model="ir.actions.act_window">
+    <!-- Specific view references for dashboard actions -->
+    <record id="action_dashboard_partnership_inquiry_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_partnership_inquiry_dashboard_list"/>
+        <field name="act_window_id" ref="action_dashboard_partnership_inquiry"/>
+    </record>
+
+    <record id="action_dashboard_partnership_inquiry_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_partnership_inquiry_dashboard_form"/>
+        <field name="act_window_id" ref="action_dashboard_partnership_inquiry"/>
+    </record>
+
+    <record id="action_dashboard_donation_inquiry" model="ir.actions.act_window">
         <field name="name">Donation Inquiries</field>
         <field name="res_model">donation.inquiry</field>
         <field name="view_mode">list,form</field>
-        <field name="view_id" ref="view_donation_inquiry_list"/>
         <field name="context">{'create': False}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -223,11 +236,24 @@
         </field>
     </record>
 
-    <record id="action_collaboration_inquiry" model="ir.actions.act_window">
+    <record id="action_dashboard_donation_inquiry_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_donation_inquiry_dashboard_list"/>
+        <field name="act_window_id" ref="action_dashboard_donation_inquiry"/>
+    </record>
+
+    <record id="action_dashboard_donation_inquiry_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_donation_inquiry_dashboard_form"/>
+        <field name="act_window_id" ref="action_dashboard_donation_inquiry"/>
+    </record>
+
+    <record id="action_dashboard_collaboration_inquiry" model="ir.actions.act_window">
         <field name="name">Collaboration Inquiries</field>
         <field name="res_model">collaboration.inquiry</field>
         <field name="view_mode">list,form</field>
-        <field name="view_id" ref="view_collaboration_inquiry_list"/>
         <field name="context">{'create': False}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -237,5 +263,19 @@
                 Collaboration inquiries from your website will appear here.
             </p>
         </field>
+    </record>
+
+    <record id="action_dashboard_collaboration_inquiry_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_collaboration_inquiry_dashboard_list"/>
+        <field name="act_window_id" ref="action_dashboard_collaboration_inquiry"/>
+    </record>
+
+    <record id="action_dashboard_collaboration_inquiry_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_collaboration_inquiry_dashboard_form"/>
+        <field name="act_window_id" ref="action_dashboard_collaboration_inquiry"/>
     </record>
 </odoo>

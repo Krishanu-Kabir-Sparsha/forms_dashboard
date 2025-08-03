@@ -654,33 +654,15 @@ export class FormsDashboard extends Component {
     }
     
     openPartnerships() {
-        this.action.doAction({
-            name: "Partnership Inquiries",
-            type: "ir.actions.act_window",
-            res_model: "partnership.inquiry",
-            view_mode: "list,form",
-            views: [[false, "list"], [false, "form"]],
-        });
+        this.action.doAction('forms_dashboard.action_partnership_inquiry');
     }
     
     openDonations() {
-        this.action.doAction({
-            name: "Donation Inquiries",
-            type: "ir.actions.act_window",
-            res_model: "donation.inquiry",
-            view_mode: "list,form",
-            views: [[false, "list"], [false, "form"]],
-        });
+        this.action.doAction('forms_dashboard.action_donation_inquiry');
     }
     
     openCollaborations() {
-        this.action.doAction({
-            name: "Collaboration Inquiries",
-            type: "ir.actions.act_window",
-            res_model: "collaboration.inquiry",
-            view_mode: "list,form",
-            views: [[false, "list"], [false, "form"]],
-        });
+        this.action.doAction('forms_dashboard.action_collaboration_inquiry');
     }
 }
 

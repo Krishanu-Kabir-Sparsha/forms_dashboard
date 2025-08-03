@@ -19,7 +19,7 @@
               parent="menu_forms_dashboard_root"
               sequence="2"/>
 
-    <!-- Inquiry Type Menus -->
+    <!-- Inquiry Type Menus - Using the main actions from the respective view files -->
     <menuitem id="menu_partnership_inquiry"
               name="Partnership Inquiries"
               parent="menu_forms_inquiries"
