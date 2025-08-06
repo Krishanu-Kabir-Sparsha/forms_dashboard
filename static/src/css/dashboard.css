@@ -1,3 +1,39 @@
+/* Form Full Width Fix - Specific solution for the blank space problem */
+.o_form_view .o_form_sheet_bg {
+    padding: 0 !important;
+    background-color: transparent !important;
+}
+
+.o_form_view .o_form_sheet {
+    min-width: unset !important;
+    max-width: none !important; /* This is the critical rule */
+    width: 100% !important; 
+    margin: 0 !important;
+    padding: 16px !important;
+    box-shadow: none !important;
+}
+
+/* This rule specifically targets the sheet container */
+.o_form_view .o_form_sheet_bg .o_form_sheet {
+    max-width: none !important;
+}
+
+/* Fix padding in form view */
+.o_form_view {
+    width: 100% !important;
+}
+
+/* Ensure form content fills the width */
+.o_form_view .o_group {
+    width: 100% !important;
+}
+
+/* Compatibility with sidebar if present */
+.o_form_view.has_sidebar .o_form_sheet {
+    padding-right: 16px !important;
+}
+
+
 /* Dashboard Layout */
 .forms_dashboard_main {
     height: calc(100vh - 150px);
