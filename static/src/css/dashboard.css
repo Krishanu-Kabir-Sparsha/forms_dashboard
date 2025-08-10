@@ -33,7 +33,6 @@
     padding-right: 16px !important;
 }
 
-
 /* Dashboard Layout */
 .forms_dashboard_main {
     height: calc(100vh - 150px);
@@ -58,13 +57,45 @@
     padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     border: 1px solid #E0E0E0;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-left 0.3s;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Enhanced Card Hover Effects */
+.forms_dashboard_stat_card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #714B67, #00A09D);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.forms_dashboard_stat_card:hover::before {
+    transform: scaleX(1);
 }
 
 .forms_dashboard_stat_card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(113, 75, 103, 0.1);
+    box-shadow: 0 8px 16px rgba(113, 75, 103, 0.15);
+}
+
+/* Card Type Specific Hover */
+.partnership-card:hover {
+    border-left: 4px solid #714B67;
+}
+
+.donation-card:hover {
+    border-left: 4px solid #00A09D;
+}
+
+.collaboration-card:hover {
+    border-left: 4px solid #F39C12;
 }
 
 /* Stats Card Content */
@@ -72,6 +103,11 @@
     font-size: 24px;
     color: #714B67;
     margin-bottom: 1rem;
+}
+
+.forms_dashboard_stat_content {
+    position: relative;
+    z-index: 1;
 }
 
 .forms_dashboard_stat_number {
@@ -88,6 +124,12 @@
     font-weight: 500;
 }
 
+.forms_dashboard_stat_subtitle {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+}
+
 /* Filters Section */
 .forms_dashboard_filters {
     display: flex;
@@ -95,7 +137,7 @@
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
     align-items: center;
-    background: #FFFFFF;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -108,6 +150,15 @@
     gap: 0.5rem;
 }
 
+.forms_dashboard_filter_group label {
+    display: flex;
+    align-items: center;
+}
+
+.forms_dashboard_filter_group label i {
+    margin-right: 0.25rem;
+}
+
 /* Custom Date Range Group */
 .forms_dashboard_custom_date_group {
     display: flex;
@@ -117,10 +168,28 @@
     background: #f8f9fa;
     border-radius: 6px;
     border: 1px solid #dee2e6;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .forms_dashboard_custom_date_group input[type="date"] {
     max-width: 150px;
+}
+
+/* Date validation error state */
+input[type="date"]:invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
 }
 
 /* Form Controls */
@@ -208,6 +277,28 @@
 .badge-approved { background-color: #007bff; }
 .badge-active { background-color: #28a745; }
 
+/* Pulse animation for new badges */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(113, 75, 103, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(113, 75, 103, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(113, 75, 103, 0);
+    }
+}
+
+.badge.pulse {
+    animation: pulse 2s infinite;
+}
+
+/* Date Range Badge */
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+}
+
 /* Recent Activity Table */
 .forms_dashboard_recent {
     background: #FFFFFF;
@@ -222,6 +313,12 @@
     color: #4C4C4C;
     font-size: 1.25rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.forms_dashboard_recent h3 i {
+    margin-right: 0.5rem;
 }
 
 .forms_dashboard_recent .table-responsive {
@@ -332,10 +429,10 @@
 /* Loading Spinner */
 .loading-spinner {
     display: inline-block;
-    width: 1rem;
-    height: 1rem;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #714B67;
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #714B67;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-left: 0.5rem;
@@ -358,6 +455,11 @@
     min-height: 400px;
     display: flex;
     flex-direction: column;
+    transition: box-shadow 0.3s ease;
+}
+
+.forms_dashboard_chart_card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .forms_dashboard_chart_header {
@@ -372,6 +474,12 @@
     font-weight: 600;
     color: #4C4C4C;
     font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.forms_dashboard_chart_title i {
+    margin-right: 0.5rem;
 }
 
 .forms_dashboard_chart_container {
@@ -393,6 +501,16 @@
 .chartjs-render-monitor {
     animation: none !important;
     -webkit-animation: none !important;
+}
+
+/* Empty State */
+.forms_dashboard_recent tbody td[colspan="5"] {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.forms_dashboard_recent tbody td[colspan="5"] i {
+    color: #dee2e6;
 }
 
 /* Keyframes */
@@ -477,10 +595,6 @@
     
     .forms_dashboard_charts {
         grid-template-columns: 1fr;
-    }
-    
-    .forms_dashboard_chart_card {
-        min-height: 350px;
     }
     
     .forms_dashboard_chart_container {

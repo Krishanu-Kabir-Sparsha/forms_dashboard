@@ -2,10 +2,12 @@
 <templates xml:space="preserve">
     <t t-name="forms_dashboard.MainDashboard">
         <div class="forms_dashboard_main">
-            <!-- Filters Section -->
+            <!-- Enhanced Filters Section -->
             <div class="forms_dashboard_filters">
                 <div class="forms_dashboard_filter_group">
-                    <label for="dateRange" class="me-2">Date Range:</label>
+                    <label for="dateRange" class="me-2 fw-bold">
+                        <i class="fa fa-calendar me-1"/>Date Range:
+                    </label>
                     <select class="form-select" id="dateRange" t-on-change="onDateRangeChange">
                         <option value="7">Last 7 Days</option>
                         <option value="30">Last 30 Days</option>
@@ -15,7 +17,7 @@
                     </select>
                 </div>
                 
-                <!-- Custom Date Range Picker - FIXED -->
+                <!-- Enhanced Custom Date Range Picker -->
                 <t t-if="state.showCustomDate">
                     <div class="forms_dashboard_custom_date_group">
                         <label for="dateFrom" class="me-2">From:</label>
@@ -23,18 +25,22 @@
                                id="dateFrom" 
                                class="form-control form-control-sm" 
                                t-att-value="state.customDateFrom"
+                               t-att-max="formatDateForInput(new Date())"
                                t-on-change="onCustomDateFromChange"/>
                         <label for="dateTo" class="mx-2">To:</label>
                         <input type="date" 
                                id="dateTo" 
                                class="form-control form-control-sm" 
                                t-att-value="state.customDateTo"
+                               t-att-max="formatDateForInput(new Date())"
                                t-on-change="onCustomDateToChange"/>
                     </div>
                 </t>
                 
-                <div class="forms_dashboard_filter_group">
-                    <label for="statusFilter" class="me-2">Status:</label>
+                <!-- <div class="forms_dashboard_filter_group">
+                    <label for="statusFilter" class="me-2 fw-bold">
+                        <i class="fa fa-filter me-1"/>Status:
+                    </label>
                     <select class="form-select" id="statusFilter" t-on-change="onStatusChange">
                         <option value="all">All Status</option>
                         <option value="new">New</option>
@@ -49,25 +55,32 @@
                         <option value="approved">Approved</option>
                         <option value="active">Active</option>
                     </select>
-                </div>
+                </div> -->
                 <button class="btn btn-secondary" t-on-click="exportData">
                     <i class="fa fa-download me-2"/>Export
                 </button>
                 <div t-if="state.loading" class="loading-spinner"/>
-                <div class="ms-auto text-muted">
-                    <small>Last updated: <t t-esc="state.lastUpdate"/></small>
+                <div class="ms-auto">
+                    <span class="badge bg-info text-white me-2">
+                        <i class="fa fa-clock-o me-1"/>
+                        <t t-esc="state.dateRangeDisplay"/>
+                    </span>
+                    <small class="text-muted">Last updated: <t t-esc="state.lastUpdate"/></small>
                 </div>
             </div>
 
-            <!-- Charts Section -->
+            <!-- Enhanced Charts Section -->
             <div class="forms_dashboard_charts mb-4">
                 <div class="forms_dashboard_chart_card">
                     <div class="forms_dashboard_chart_header">
-                        <div class="forms_dashboard_chart_title">Inquiry Trends</div>
+                        <div class="forms_dashboard_chart_title">
+                            <i class="fa fa-line-chart me-2 text-primary"/>
+                            Inquiry Trends
+                        </div>
                         <select class="form-select form-select-sm" style="width: auto;" t-on-change="onTrendPeriodChange">
-                            <option value="daily" t-att-selected="state.trendPeriod === 'daily' ? 'selected' : undefined">Daily</option>
-                            <option value="weekly" t-att-selected="state.trendPeriod === 'weekly' ? 'selected' : undefined">Weekly</option>
-                            <option value="monthly" t-att-selected="state.trendPeriod === 'monthly' ? 'selected' : undefined">Monthly</option>
+                            <option value="daily" t-att-selected="state.trendPeriod === 'daily' ? 'selected' : undefined">Daily View</option>
+                            <option value="weekly" t-att-selected="state.trendPeriod === 'weekly' ? 'selected' : undefined">Weekly View</option>
+                            <option value="monthly" t-att-selected="state.trendPeriod === 'monthly' ? 'selected' : undefined">Monthly View</option>
                         </select>
                     </div>
                     <div class="forms_dashboard_chart_container">
@@ -77,7 +90,10 @@
                 
                 <div class="forms_dashboard_chart_card">
                     <div class="forms_dashboard_chart_header">
-                        <div class="forms_dashboard_chart_title">Status Distribution</div>
+                        <div class="forms_dashboard_chart_title">
+                            <i class="fa fa-pie-chart me-2 text-success"/>
+                            Status Distribution
+                        </div>
                     </div>
                     <div class="forms_dashboard_chart_container">
                         <canvas t-ref="statusChart"></canvas>
@@ -85,50 +101,65 @@
                 </div>
             </div>
 
-            <!-- Stats Cards -->
+            <!-- Enhanced Stats Cards with Better Visual Feedback -->
             <div class="forms_dashboard_stats">
-                <div class="forms_dashboard_stat_card" t-on-click="openPartnerships">
+                <div class="forms_dashboard_stat_card partnership-card" t-on-click="openPartnerships">
                     <div class="forms_dashboard_stat_icon">
                         <i class="fa fa-handshake-o"/>
                     </div>
-                    <div class="forms_dashboard_stat_number">
-                        <t t-esc="state.partnerships"/>
-                    </div>
-                    <div class="forms_dashboard_stat_label">Partnerships</div>
-                    <div t-if="state.partnerships_new" class="mt-2">
-                        <span class="badge badge-new">
-                            <t t-esc="state.partnerships_new"/> New
-                        </span>
+                    <div class="forms_dashboard_stat_content">
+                        <div class="forms_dashboard_stat_number">
+                            <t t-esc="state.partnerships"/>
+                        </div>
+                        <div class="forms_dashboard_stat_label">Partnerships</div>
+                        <div class="forms_dashboard_stat_subtitle text-muted">
+                            <small><t t-esc="state.dateRangeDisplay"/></small>
+                        </div>
+                        <div t-if="state.partnerships_new" class="mt-2">
+                            <span class="badge badge-new pulse">
+                                <t t-esc="state.partnerships_new"/> New Today
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="forms_dashboard_stat_card" t-on-click="openDonations">
+                <div class="forms_dashboard_stat_card donation-card" t-on-click="openDonations">
                     <div class="forms_dashboard_stat_icon">
                         <i class="fa fa-gift"/>
                     </div>
-                    <div class="forms_dashboard_stat_number">
-                        <t t-esc="state.donations"/>
-                    </div>
-                    <div class="forms_dashboard_stat_label">Donations</div>
-                    <div t-if="state.donations_new" class="mt-2">
-                        <span class="badge badge-new">
-                            <t t-esc="state.donations_new"/> New
-                        </span>
+                    <div class="forms_dashboard_stat_content">
+                        <div class="forms_dashboard_stat_number">
+                            <t t-esc="state.donations"/>
+                        </div>
+                        <div class="forms_dashboard_stat_label">Donations</div>
+                        <div class="forms_dashboard_stat_subtitle text-muted">
+                            <small><t t-esc="state.dateRangeDisplay"/></small>
+                        </div>
+                        <div t-if="state.donations_new" class="mt-2">
+                            <span class="badge badge-new pulse">
+                                <t t-esc="state.donations_new"/> New Today
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="forms_dashboard_stat_card" t-on-click="openCollaborations">
+                <div class="forms_dashboard_stat_card collaboration-card" t-on-click="openCollaborations">
                     <div class="forms_dashboard_stat_icon">
                         <i class="fa fa-users"/>
                     </div>
-                    <div class="forms_dashboard_stat_number">
-                        <t t-esc="state.collaborations"/>
-                    </div>
-                    <div class="forms_dashboard_stat_label">Collaborations</div>
-                    <div t-if="state.collaborations_new" class="mt-2">
-                        <span class="badge badge-new">
-                            <t t-esc="state.collaborations_new"/> New
-                        </span>
+                    <div class="forms_dashboard_stat_content">
+                        <div class="forms_dashboard_stat_number">
+                            <t t-esc="state.collaborations"/>
+                        </div>
+                        <div class="forms_dashboard_stat_label">Collaborations</div>
+                        <div class="forms_dashboard_stat_subtitle text-muted">
+                            <small><t t-esc="state.dateRangeDisplay"/></small>
+                        </div>
+                        <div t-if="state.collaborations_new" class="mt-2">
+                            <span class="badge badge-new pulse">
+                                <t t-esc="state.collaborations_new"/> New Today
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -136,8 +167,14 @@
             <!-- Recent Activity Section -->
             <div class="forms_dashboard_recent">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h3 class="mb-0">Recent Activity</h3>
-                    <small class="text-muted">Click on any row to view details</small>
+                    <h3 class="mb-0">
+                        <i class="fa fa-clock-o me-2 text-primary"/>
+                        Recent Activity
+                    </h3>
+                    <small class="text-muted">
+                        <i class="fa fa-info-circle me-1"/>
+                        Click on any row to view details
+                    </small>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover forms_dashboard_activity_table">
@@ -179,7 +216,8 @@
                             </t>
                             <tr t-if="!state.recentActivity || state.recentActivity.length === 0">
                                 <td colspan="5" class="text-center text-muted py-3">
-                                    No activities found
+                                    <i class="fa fa-inbox fa-3x mb-3 d-block"/>
+                                    No activities found for the selected date range
                                 </td>
                             </tr>
                         </tbody>

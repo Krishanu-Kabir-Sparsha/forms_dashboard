@@ -8,6 +8,7 @@ export class FormsDashboard extends Component {
     setup() {
         this.action = useService("action");
         this.orm = useService("orm");
+        this.notification = useService("notification");
         
         this.trendChartRef = useRef("trendChart");
         this.statusChartRef = useRef("statusChart");
@@ -37,7 +38,9 @@ export class FormsDashboard extends Component {
             trendPeriod: 'daily',
             customDateFrom: '',
             customDateTo: '',
-            showCustomDate: false
+            showCustomDate: false,
+            // Add date range display
+            dateRangeDisplay: 'Last 7 Days'
         });
         
         onWillStart(async () => {
@@ -126,6 +129,33 @@ export class FormsDashboard extends Component {
         return `${year}-${month}-${day}`;
     }
 
+    validateDateRange(fromDate, toDate) {
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        const from = new Date(fromDate);
+        const to = new Date(toDate);
+        
+        // Check if dates are in future
+        if (from > today || to > today) {
+            this.notification.add("Cannot select future dates. Please select dates up to today.", {
+                title: "Invalid Date Range",
+                type: "danger",
+            });
+            return false;
+        }
+        
+        // Check if from date is after to date
+        if (from > to) {
+            this.notification.add("Start date cannot be after end date.", {
+                title: "Invalid Date Range",
+                type: "danger",
+            });
+            return false;
+        }
+        
+        return true;
+    }
+
     async initializeCharts() {
         try {
             // Check if refs are available
@@ -136,7 +166,7 @@ export class FormsDashboard extends Component {
                 return;
             }
 
-            // Get initial data
+            // Get initial data with date range
             const [trendData, statusData] = await Promise.all([
                 this.getTrendData(),
                 this.getStatusDistribution()
@@ -154,7 +184,7 @@ export class FormsDashboard extends Component {
         // Destroy existing charts
         this.destroyCharts();
         
-        // Create trend chart
+        // Create trend chart - IMPROVED VERSION
         const trendCanvas = this.trendChartRef.el;
         if (trendCanvas) {
             const trendCtx = trendCanvas.getContext('2d');
@@ -167,26 +197,44 @@ export class FormsDashboard extends Component {
                             {
                                 label: 'Partnerships',
                                 borderColor: '#714B67',
-                                backgroundColor: 'rgba(113, 75, 103, 0.1)',
+                                backgroundColor: 'transparent', // Remove background
                                 data: trendData.datasets[0].data || [],
                                 tension: 0.4,
-                                fill: true
+                                fill: false, // No fill
+                                borderWidth: 3,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                pointBackgroundColor: '#714B67',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
                             },
                             {
                                 label: 'Donations',
                                 borderColor: '#00A09D',
-                                backgroundColor: 'rgba(0, 160, 157, 0.1)',
+                                backgroundColor: 'transparent', // Remove background
                                 data: trendData.datasets[1].data || [],
                                 tension: 0.4,
-                                fill: true
+                                fill: false, // No fill
+                                borderWidth: 3,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                pointBackgroundColor: '#00A09D',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
                             },
                             {
                                 label: 'Collaborations',
-                                borderColor: '#a77f28ff',
-                                backgroundColor: 'rgba(167, 123, 40, 0.1)',
+                                borderColor: '#F39C12',
+                                backgroundColor: 'transparent', // Remove background
                                 data: trendData.datasets[2].data || [],
                                 tension: 0.4,
-                                fill: true
+                                fill: false, // No fill
+                                borderWidth: 3,
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                pointBackgroundColor: '#F39C12',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2
                             }
                         ]
                     },
@@ -202,7 +250,29 @@ export class FormsDashboard extends Component {
                                 position: 'bottom',
                                 labels: {
                                     usePointStyle: true,
-                                    padding: 20
+                                    padding: 20,
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                padding: 12,
+                                cornerRadius: 8,
+                                titleFont: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y + ' inquiries';
+                                    }
                                 }
                             }
                         },
@@ -210,7 +280,32 @@ export class FormsDashboard extends Component {
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)',
+                                    drawBorder: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Number of Inquiries',
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        size: 11
+                                    }
                                 }
                             }
                         }
@@ -251,7 +346,19 @@ export class FormsDashboard extends Component {
                                 position: 'bottom',
                                 labels: {
                                     padding: 20,
-                                    usePointStyle: true
+                                    usePointStyle: true,
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                        return context.label + ': ' + context.parsed + ' (' + percentage + '%)';
+                                    }
                                 }
                             }
                         }
@@ -259,6 +366,29 @@ export class FormsDashboard extends Component {
                 });
             }
         }
+    }
+
+    getDateRangeDomain(days = null) {
+        if (this.state.showCustomDate && this.state.customDateFrom && this.state.customDateTo) {
+            return this.state.customDateFrom + ' 00:00:00';
+        } else if (days !== null) {
+            const date = new Date();
+            date.setDate(date.getDate() - days);
+            return date.toISOString().split('T')[0] + ' 00:00:00';
+        }
+        return null;
+    }
+
+    getDateRangeFilter() {
+        if (this.state.showCustomDate && this.state.customDateFrom && this.state.customDateTo) {
+            return [
+                ['create_date', '>=', this.state.customDateFrom + ' 00:00:00'],
+                ['create_date', '<=', this.state.customDateTo + ' 23:59:59']
+            ];
+        } else if (this.state.dateRange !== 'all') {
+            return [['create_date', '>=', this.getDateRangeDomain(this.state.dateRange)]];
+        }
+        return [];
     }
 
     async getTrendData() {
@@ -272,24 +402,29 @@ export class FormsDashboard extends Component {
                     labels = Array.from({length: 7}, (_, i) => {
                         const d = new Date();
                         d.setDate(d.getDate() - (6 - i));
-                        return d.toLocaleDateString('en-US', { weekday: 'short' });
+                        return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
                     });
                     break;
                 case 'weekly':
                     days = 28;
-                    labels = Array.from({length: 4}, (_, i) => `Week ${i + 1}`);
+                    labels = Array.from({length: 4}, (_, i) => {
+                        const d = new Date();
+                        d.setDate(d.getDate() - (7 * (3 - i)));
+                        return `Week of ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+                    });
                     break;
                 case 'monthly':
                     days = 180;
                     labels = Array.from({length: 6}, (_, i) => {
                         const d = new Date();
                         d.setMonth(d.getMonth() - (5 - i));
-                        return d.toLocaleDateString('en-US', { month: 'short' });
+                        return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                     });
                     break;
             }
 
-            const domain = [['create_date', '>=', this.getDateRangeDomain(days)]];
+            // Apply date range filter
+            const domain = this.getDateRangeFilter();
 
             const [partnerships, donations, collaborations] = await Promise.all([
                 this.orm.searchRead('partnership.inquiry', domain, ['create_date']),
@@ -358,12 +493,15 @@ export class FormsDashboard extends Component {
         const statuses = ['new', 'in_progress', 'qualified', 'done', 'cancelled', 'declined', 'converted'];
         
         try {
+            // Apply date range filter
+            const domain = this.getDateRangeFilter();
+            
             const counts = await Promise.all(
                 statuses.map(status => 
                     Promise.all([
-                        this.orm.searchCount('partnership.inquiry', [['state', '=', status]]),
-                        this.orm.searchCount('donation.inquiry', [['state', '=', status]]),
-                        this.orm.searchCount('collaboration.inquiry', [['state', '=', status]])
+                        this.orm.searchCount('partnership.inquiry', [...domain, ['state', '=', status]]),
+                        this.orm.searchCount('donation.inquiry', [...domain, ['state', '=', status]]),
+                        this.orm.searchCount('collaboration.inquiry', [...domain, ['state', '=', status]])
                     ]).then(results => results.reduce((a, b) => a + b, 0))
                 )
             );
@@ -437,17 +575,8 @@ export class FormsDashboard extends Component {
     }
 
     async loadCounts() {
-        const dateRange = this.state.dateRange;
-        let domain = [];
-        
-        if (this.state.showCustomDate && this.state.customDateFrom && this.state.customDateTo) {
-            domain = [
-                ['create_date', '>=', this.state.customDateFrom + ' 00:00:00'],
-                ['create_date', '<=', this.state.customDateTo + ' 23:59:59']
-            ];
-        } else if (dateRange !== 'all') {
-            domain = [['create_date', '>=', this.getDateRangeDomain(dateRange)]];
-        }
+        // Apply consistent date range filter
+        const domain = this.getDateRangeFilter();
 
         const [partnerships, donations, collaborations] = await Promise.all([
             this.orm.searchCount("partnership.inquiry", domain),
@@ -455,6 +584,7 @@ export class FormsDashboard extends Component {
             this.orm.searchCount("collaboration.inquiry", domain)
         ]);
 
+        // New inquiries (last 24 hours)
         const newDomain = [['create_date', '>=', this.getDateRangeDomain(1)]];
         const [partnerships_new, donations_new, collaborations_new] = await Promise.all([
             this.orm.searchCount("partnership.inquiry", newDomain),
@@ -470,23 +600,9 @@ export class FormsDashboard extends Component {
         this.state.collaborations_new = collaborations_new;
     }
 
-    getDateRangeDomain(days) {
-        const date = new Date();
-        date.setDate(date.getDate() - days);
-        return date.toISOString().split('T')[0] + ' 00:00:00';
-    }
-
     async loadRecentActivity() {
         try {
-            const dateRange = this.state.dateRange;
-            let domain = [];
-            
-            if (this.state.showCustomDate && this.state.customDateFrom && this.state.customDateTo) {
-                domain.push(['create_date', '>=', this.state.customDateFrom + ' 00:00:00']);
-                domain.push(['create_date', '<=', this.state.customDateTo + ' 23:59:59']);
-            } else if (dateRange !== 'all') {
-                domain.push(['create_date', '>=', this.getDateRangeDomain(dateRange)]);
-            }
+            const domain = this.getDateRangeFilter();
 
             if (this.state.statusFilter !== 'all') {
                 domain.push(['state', '=', this.state.statusFilter]);
@@ -573,29 +689,84 @@ export class FormsDashboard extends Component {
             
             this.state.customDateTo = this.formatDateForInput(today);
             this.state.customDateFrom = this.formatDateForInput(thirtyDaysAgo);
+            this.state.dateRangeDisplay = 'Custom Range';
         } else {
             this.state.showCustomDate = false;
             this.state.dateRange = parseInt(value) || 'all';
+            
+            // Update display text
+            switch(value) {
+                case '7':
+                    this.state.dateRangeDisplay = 'Last 7 Days';
+                    break;
+                case '30':
+                    this.state.dateRangeDisplay = 'Last 30 Days';
+                    break;
+                case '90':
+                    this.state.dateRangeDisplay = 'Last 90 Days';
+                    break;
+                case 'all':
+                    this.state.dateRangeDisplay = 'All Time';
+                    break;
+            }
+            
             await this.loadData();
         }
     }
 
-    // FIXED: Separate event handlers for custom date inputs
     async onCustomDateFromChange(ev) {
-        this.state.customDateFrom = ev.target.value;
+        const newDate = ev.target.value;
+        const today = this.formatDateForInput(new Date());
+        
+        // Validate date
+        if (newDate > today) {
+            this.notification.add("Start date cannot be in the future.", {
+                title: "Invalid Date",
+                type: "danger",
+            });
+            ev.target.value = this.state.customDateFrom;
+            return;
+        }
+        
+        this.state.customDateFrom = newDate;
+        
         if (this.state.customDateFrom && this.state.customDateTo) {
-            await this.loadData();
+            if (this.validateDateRange(this.state.customDateFrom, this.state.customDateTo)) {
+                await this.loadData();
+            } else {
+                // Reset to previous value if validation fails
+                ev.target.value = '';
+                this.state.customDateFrom = '';
+            }
         }
     }
 
     async onCustomDateToChange(ev) {
-        this.state.customDateTo = ev.target.value;
+        const newDate = ev.target.value;
+        const today = this.formatDateForInput(new Date());
+        
+        // Validate date
+        if (newDate > today) {
+            this.notification.add("End date cannot be in the future.", {
+                title: "Invalid Date",
+                type: "danger",
+            });
+            ev.target.value = this.state.customDateTo;
+            return;
+        }
+        
+        this.state.customDateTo = newDate;
+        
         if (this.state.customDateFrom && this.state.customDateTo) {
-            await this.loadData();
+            if (this.validateDateRange(this.state.customDateFrom, this.state.customDateTo)) {
+                await this.loadData();
+            } else {
+                // Reset to previous value if validation fails
+                ev.target.value = '';
+                this.state.customDateTo = '';
+            }
         }
     }
-
-    // Remove the old onCustomDateChange method if it exists
 
     async onStatusChange(ev) {
         this.state.statusFilter = ev.target.value;
@@ -637,7 +808,6 @@ export class FormsDashboard extends Component {
         ].join('\n');
     }
 
-    // Open specific inquiry record - FIXED METHOD
     openInquiryRecord(activity) {
         try {
             this.action.doAction({
