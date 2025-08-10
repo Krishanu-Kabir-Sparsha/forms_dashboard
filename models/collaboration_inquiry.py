@@ -10,10 +10,10 @@ class CollaborationInquiry(models.Model):
 
     name = fields.Char(string='Reference', required=True, copy=False, 
                       readonly=True, default='New', tracking=True)
-    institution_name = fields.Char(string='Institution Name', required=True, tracking=True)
-    contact_name = fields.Char(string='Contact Person', required=True, tracking=True)
-    email = fields.Char(string='Email', required=True, tracking=True)
-    phone = fields.Char(string='Phone')
+    institution_name = fields.Char(string='Institution Name', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    contact_name = fields.Char(string='Contact Person', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    email = fields.Char(string='Email', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    phone = fields.Char(string='Phone', readonly=True, states={'draft': [('readonly', False)]})
     collaboration_type = fields.Selection([
         ('joint_prog', 'Joint Program'),
         ('faculty_ex', 'Faculty Exchange'),
@@ -21,16 +21,16 @@ class CollaborationInquiry(models.Model):
         ('policy_res', 'Policy Research'),
         ('student_ex', 'Student Exchange'),
         ('multi', 'Multiple')
-    ], string='Collaboration Type', required=True, tracking=True)
+    ], string='Collaboration Type', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
     institution_type = fields.Selection([
         ('uni', 'University'),
         ('research_inst', 'Research Institute'),
         ('gov', 'Govt. Agency'),
         ('ngo', 'NGO/Non-Profit'),
         ('intl_org', 'Intl. Organization')
-    ], string='Institution Type')
-    country = fields.Char(string='Country/Region')
-    scope = fields.Text(string='Collaboration Scope')
+    ], string='Institution Type', readonly=True, states={'draft': [('readonly', False)]})
+    country = fields.Char(string='Country/Region', readonly=True, states={'draft': [('readonly', False)]})
+    scope = fields.Text(string='Collaboration Scope', readonly=True, states={'draft': [('readonly', False)]})
     state = fields.Selection([
         ('new', 'New'),
         ('in_progress', 'In Progress'),
@@ -56,7 +56,20 @@ class CollaborationInquiry(models.Model):
     # Additional fields
     color = fields.Integer(string='Color Index')
     activity_count = fields.Integer(compute='_compute_activity_count')
-    internal_notes = fields.Text(string='Internal Notes')
+
+    # Change internal_notes from Text to Html for rich text editor
+    internal_notes = fields.Html(
+        string='Internal Notes',
+        sanitize=True,
+        sanitize_attributes=False,
+        sanitize_form=False
+    )
+    
+    # Add computed field to check if record is from website
+    is_website_submission = fields.Boolean(
+        compute='_compute_is_website_submission',
+        store=True
+    )
     
     # Agreement fields
     agreement_signed = fields.Boolean(string='Agreement Signed')
@@ -73,6 +86,11 @@ class CollaborationInquiry(models.Model):
     
     # Track state changes
     state_history = fields.One2many('inquiry.state.history', 'collaboration_inquiry_id', string='State History')
+
+    @api.depends('source')
+    def _compute_is_website_submission(self):
+        for record in self:
+            record.is_website_submission = record.source == 'website'
 
     @api.depends('activity_ids')
     def _compute_activity_count(self):
@@ -94,19 +112,53 @@ class CollaborationInquiry(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('collaboration.inquiry') or 'New'
         return super(CollaborationInquiry, self).create(vals_list)
+    
+    # Add method to schedule activity programmatically
+    def schedule_activity(self, activity_type_id, summary, date_deadline, user_id=None):
+        """Helper method to schedule activities"""
+        self.ensure_one()
+        activity_vals = {
+            'activity_type_id': activity_type_id,
+            'summary': summary,
+            'date_deadline': date_deadline,
+            'res_model_id': self.env['ir.model']._get(self._name).id,
+            'res_id': self.id,
+            'user_id': user_id or self.env.user.id,
+        }
+        return self.env['mail.activity'].create(activity_vals)
+    
+    def action_schedule_activity(self):
+        """Open activity scheduling popup"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Schedule Activity',
+            'res_model': 'mail.activity',
+            'view_mode': 'form',
+            'target': 'new',  # Opens as popup
+            'context': {
+                'default_res_id': self.id,
+                'default_res_model': self._name,
+                'default_res_model_id': self.env['ir.model']._get(self._name).id,
+                'default_user_id': self.env.user.id,
+            }
+        }
 
     def action_view_activities(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Activities',
+            'name': f'Activities - {self.name}',
             'res_model': 'mail.activity',
             'view_mode': 'list,form',
             'domain': [('res_id', '=', self.id), ('res_model', '=', self._name)],
             'context': {
                 'default_res_id': self.id,
                 'default_res_model': self._name,
-            }
+                'default_res_model_id': self.env['ir.model']._get(self._name).id,
+                'default_user_id': self.env.user.id,
+            },
+            'target': 'current',
         }
 
     def _track_state_change(self, old_state, new_state, note=''):

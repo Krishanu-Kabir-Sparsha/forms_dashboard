@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Partnership Activity View -->
+    <record id="view_partnership_inquiry_activity" model="ir.ui.view">
+        <field name="name">partnership.inquiry.activity</field>
+        <field name="model">partnership.inquiry</field>
+        <field name="arch" type="xml">
+            <activity string="Partnership Activities">
+                <field name="name"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <div>
+                            <field name="name" display="full" class="o_text_bold"/>
+                            <field name="company_name" muted="1" display="full"/>
+                            <field name="state" widget="badge" decoration-info="state=='new'" decoration-success="state in ['qualified','converted']"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+
+    <!-- Donation Activity View -->
+    <record id="view_donation_inquiry_activity" model="ir.ui.view">
+        <field name="name">donation.inquiry.activity</field>
+        <field name="model">donation.inquiry</field>
+        <field name="arch" type="xml">
+            <activity string="Donation Activities">
+                <field name="name"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <div>
+                            <field name="name" display="full" class="o_text_bold"/>
+                            <field name="donor_name" muted="1" display="full"/>
+                            <field name="state" widget="badge" decoration-info="state=='new'" decoration-success="state in ['committed','received']"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+
+    <!-- Collaboration Activity View -->
+    <record id="view_collaboration_inquiry_activity" model="ir.ui.view">
+        <field name="name">collaboration.inquiry.activity</field>
+        <field name="model">collaboration.inquiry</field>
+        <field name="arch" type="xml">
+            <activity string="Collaboration Activities">
+                <field name="name"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <div>
+                            <field name="name" display="full" class="o_text_bold"/>
+                            <field name="institution_name" muted="1" display="full"/>
+                            <field name="state" widget="badge" decoration-info="state=='new'" decoration-success="state in ['approved','active']"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+</odoo>

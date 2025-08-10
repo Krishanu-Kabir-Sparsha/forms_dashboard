@@ -10,24 +10,24 @@ class PartnershipInquiry(models.Model):
 
     name = fields.Char(string='Reference', required=True, copy=False, 
                       readonly=True, default='New', tracking=True)
-    company_name = fields.Char(string='Company Name', required=True, tracking=True)
-    contact_person = fields.Char(string='Contact Person', required=True, tracking=True)
-    email = fields.Char(string='Email', required=True, tracking=True)
-    phone = fields.Char(string='Phone')
+    company_name = fields.Char(string='Company Name', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    contact_person = fields.Char(string='Contact Person', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    email = fields.Char(string='Email', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    phone = fields.Char(string='Phone', readonly=True, states={'draft': [('readonly', False)]})
     partnership_type = fields.Selection([
         ('research', 'Research Collaboration'),
         ('talent', 'Talent Pipeline'),
         ('infra', 'Infrastructure'),
         ('tech', 'Tech Transfer'),
         ('multi', 'Multiple Areas')
-    ], string='Partnership Type', required=True, tracking=True)
+    ], string='Partnership Type', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
     company_size = fields.Selection([
         ('startup', 'Startup (1-50)'),
         ('medium', 'Medium (51-500)'),
         ('large', 'Large (500+)')
-    ], string='Company Size')
-    industry = fields.Char(string='Industry/Sector')
-    goals = fields.Text(string='Partnership Goals')
+    ], string='Company Size', readonly=True, states={'draft': [('readonly', False)]})
+    industry = fields.Char(string='Industry/Sector', readonly=True, states={'draft': [('readonly', False)]})
+    goals = fields.Text(string='Partnership Goals', readonly=True, states={'draft': [('readonly', False)]})
     state = fields.Selection([
         ('new', 'New'),
         ('in_progress', 'In Progress'),
@@ -53,7 +53,25 @@ class PartnershipInquiry(models.Model):
     # Additional fields
     color = fields.Integer(string='Color Index')
     activity_count = fields.Integer(compute='_compute_activity_count')
-    internal_notes = fields.Text(string='Internal Notes')
+
+    # Change internal_notes from Text to Html for rich text editor
+    internal_notes = fields.Html(
+        string='Internal Notes',
+        sanitize=True,
+        sanitize_attributes=False,
+        sanitize_form=False
+    )
+
+    # Add computed field to check if record is from website
+    is_website_submission = fields.Boolean(
+        compute='_compute_is_website_submission',
+        store=True
+    )
+
+    @api.depends('source')
+    def _compute_is_website_submission(self):
+        for record in self:
+            record.is_website_submission = record.source == 'website'
     
     # Track state changes
     state_history = fields.One2many('inquiry.state.history', 'partnership_inquiry_id', string='State History')
@@ -69,19 +87,53 @@ class PartnershipInquiry(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('partnership.inquiry') or 'New'
         return super(PartnershipInquiry, self).create(vals_list)
+    
+    # Add method to schedule activity programmatically
+    def schedule_activity(self, activity_type_id, summary, date_deadline, user_id=None):
+        """Helper method to schedule activities"""
+        self.ensure_one()
+        activity_vals = {
+            'activity_type_id': activity_type_id,
+            'summary': summary,
+            'date_deadline': date_deadline,
+            'res_model_id': self.env['ir.model']._get(self._name).id,
+            'res_id': self.id,
+            'user_id': user_id or self.env.user.id,
+        }
+        return self.env['mail.activity'].create(activity_vals)
+    
+    def action_schedule_activity(self):
+        """Open activity scheduling popup"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Schedule Activity',
+            'res_model': 'mail.activity',
+            'view_mode': 'form',
+            'target': 'new',  # Opens as popup
+            'context': {
+                'default_res_id': self.id,
+                'default_res_model': self._name,
+                'default_res_model_id': self.env['ir.model']._get(self._name).id,
+                'default_user_id': self.env.user.id,
+            }
+        }
 
     def action_view_activities(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Activities',
+            'name': f'Activities - {self.name}',
             'res_model': 'mail.activity',
             'view_mode': 'list,form',
             'domain': [('res_id', '=', self.id), ('res_model', '=', self._name)],
             'context': {
                 'default_res_id': self.id,
                 'default_res_model': self._name,
-            }
+                'default_res_model_id': self.env['ir.model']._get(self._name).id,
+                'default_user_id': self.env.user.id,
+            },
+            'target': 'current',
         }
 
     def _track_state_change(self, old_state, new_state, note=''):

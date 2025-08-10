@@ -10,28 +10,28 @@ class DonationInquiry(models.Model):
 
     name = fields.Char(string='Reference', required=True, copy=False, 
                       readonly=True, default='New', tracking=True)
-    donor_name = fields.Char(string='Donor Name', required=True, tracking=True)
-    email = fields.Char(string='Email', required=True, tracking=True)
-    phone = fields.Char(string='Phone')
+    donor_name = fields.Char(string='Donor Name', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    email = fields.Char(string='Email', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
+    phone = fields.Char(string='Phone', readonly=True, states={'draft': [('readonly', False)]})
     donation_type = fields.Selection([
         ('scholarship', 'Scholarship'),
         ('research', 'Research Grant'),
         ('infra', 'Infrastructure'),
         ('endow', 'Endowment'),
         ('general', 'General Support')
-    ], string='Donation Type', required=True, tracking=True)
+    ], string='Donation Type', required=True, tracking=True, readonly=True, states={'draft': [('readonly', False)]})
     amount_range = fields.Selection([
         ('1k-5k', '$1k - $5k'),
         ('5k-10k', '$5k - $10k'),
         ('10k-25k', '$10k - $25k'),
         ('25k+', '$25k+')
-    ], string='Amount Range')
+    ], string='Amount Range', readonly=True, states={'draft': [('readonly', False)]})
     recognition = fields.Selection([
         ('public', 'Public'),
         ('anon', 'Anonymous'),
         ('discuss', 'Discuss Later')
-    ], string='Recognition')
-    interest_areas = fields.Text(string='Interest Areas')
+    ], string='Recognition', readonly=True, states={'draft': [('readonly', False)]})
+    interest_areas = fields.Text(string='Interest Areas', readonly=True, states={'draft': [('readonly', False)]})
     state = fields.Selection([
         ('new', 'New'),
         ('in_progress', 'In Progress'),
@@ -57,7 +57,20 @@ class DonationInquiry(models.Model):
     # Additional fields
     color = fields.Integer(string='Color Index')
     activity_count = fields.Integer(compute='_compute_activity_count')
-    internal_notes = fields.Text(string='Internal Notes')
+
+    # Change internal_notes from Text to Html for rich text editor
+    internal_notes = fields.Html(
+        string='Internal Notes',
+        sanitize=True,
+        sanitize_attributes=False,
+        sanitize_form=False
+    )
+
+    # Add computed field to check if record is from website
+    is_website_submission = fields.Boolean(
+        compute='_compute_is_website_submission',
+        store=True
+    )
     
     # Financial tracking fields
     actual_amount = fields.Monetary(string='Actual Amount', currency_field='currency_id')
@@ -73,6 +86,11 @@ class DonationInquiry(models.Model):
     # Track state changes
     state_history = fields.One2many('inquiry.state.history', 'donation_inquiry_id', string='State History')
 
+    @api.depends('source')
+    def _compute_is_website_submission(self):
+        for record in self:
+            record.is_website_submission = record.source == 'website'
+
     @api.depends('activity_ids')
     def _compute_activity_count(self):
         for record in self:
@@ -84,19 +102,54 @@ class DonationInquiry(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('donation.inquiry') or 'New'
         return super(DonationInquiry, self).create(vals_list)
+    
+    # Add method to schedule activity programmatically
+    def schedule_activity(self, activity_type_id, summary, date_deadline, user_id=None):
+        """Helper method to schedule activities"""
+        self.ensure_one()
+        activity_vals = {
+            'activity_type_id': activity_type_id,
+            'summary': summary,
+            'date_deadline': date_deadline,
+            'res_model_id': self.env['ir.model']._get(self._name).id,
+            'res_id': self.id,
+            'user_id': user_id or self.env.user.id,
+        }
+        return self.env['mail.activity'].create(activity_vals)
+    
+    def action_schedule_activity(self):
+        """Open activity scheduling popup"""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Schedule Activity',
+            'res_model': 'mail.activity',
+            'view_mode': 'form',
+            'target': 'new',  # Opens as popup
+            'context': {
+                'default_res_id': self.id,
+                'default_res_model': self._name,
+                'default_res_model_id': self.env['ir.model']._get(self._name).id,
+                'default_user_id': self.env.user.id,
+            }
+        }
+        
 
     def action_view_activities(self):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Activities',
+            'name': f'Activities - {self.name}',
             'res_model': 'mail.activity',
             'view_mode': 'list,form',
             'domain': [('res_id', '=', self.id), ('res_model', '=', self._name)],
             'context': {
                 'default_res_id': self.id,
                 'default_res_model': self._name,
-            }
+                'default_res_model_id': self.env['ir.model']._get(self._name).id,
+                'default_user_id': self.env.user.id,
+            },
+            'target': 'current',
         }
 
     def _track_state_change(self, old_state, new_state, note=''):

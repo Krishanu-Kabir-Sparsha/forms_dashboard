@@ -20,6 +20,7 @@
         'security/forms_dashboard_security.xml',
         'security/ir.model.access.csv',
         'data/sequence_data.xml',
+        'views/activity_views.xml',
         'views/partnership_views.xml',
         'views/donation_views.xml',
         'views/collaboration_views.xml',
